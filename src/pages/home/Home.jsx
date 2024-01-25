@@ -37,9 +37,9 @@ export default function Home() {
                     <img className="img-b" src="images/backdrop.png" alt="" 
                         style={{ transform: `translate(${position.x * 0.05}px, ${position.y * 0.01}px) rotate(${position.y * 0.01 + 90}deg)` }}/>
                     <img className="img-m" src="images/main.webp" alt="" 
-                        style={{ transform: `translate(${position.x * 0.08}px, ${position.y * 0.03}px) rotate(${position.y * -0.05 + 20}deg)` }}/>
+                        style={{ transform: `translate(${position.x * 0.08}px, ${position.y * 0.02}px) rotate(${position.y * -0.02 + 20}deg)` }}/>
                     <img className="img-f" src="images/foreground.png" alt="" 
-                        style={{ transform: `translate(${position.x * 0.1}px, ${position.y * 0.05}px) rotate(${position.y * 0.04 + 20}deg)` }}/>
+                        style={{ transform: `translate(${position.x * 0.1}px, ${position.y * 0.04}px) rotate(${position.y * 0.03 + 20}deg)` }}/>
             </div>
         </div>
     )
