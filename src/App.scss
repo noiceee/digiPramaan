@@ -1,0 +1,27 @@
+:root{
+  --light-pink: #ee8feb;
+  --strong-red: rgb(160, 53, 53);
+}
+*{
+  margin: 0px;
+  padding: 0px;
+  font-family: 'Telegraf';
+  box-sizing: border-box;
+}
+html, body, #root{
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+@font-face {
+  font-family: 'Telegraf';
+  src: url('./fonts/PPTelegraf-Regular.otf') format('opentype');
+}
+@font-face {
+  font-family: 'Telegraf-bold';
+  src: url('./fonts/PPTelegraf-UltraBold.otf') format('opentype');
+}
+.page{
+  padding: 5%;
+  min-height: calc(100% - 100px);
+}
