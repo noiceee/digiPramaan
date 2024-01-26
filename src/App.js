@@ -7,17 +7,19 @@ import {
   Route,
   Routes as Switch,
 } from "react-router-dom";
+import Verify from './pages/verify/Verify';
 
 function App() {
   return (
     <>
-      <Navbar />
       <Router>
+      <Navbar />
         <Switch>
           <Route path="/" element={<Home />}/>
+          <Route path="/verify" element={<Verify />}/>
         </Switch>
-      </Router>
       <Footer />
+      </Router>
     </>
   );
 }
