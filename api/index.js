@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 const jsonData = {
   eventName: "PPO",
@@ -26,19 +26,19 @@ async function generateCertificate(jsonData, outputPath) {
     .replace("{{organizationName}}", jsonData.organizationName);
 
   const browser = await puppeteer.launch({
-    headless: 'new'
+    headless: "new",
   });
   const page = await browser.newPage();
 
   await page.setContent(htmlContent, { waitUntil: "load" });
 
-  await page.pdf({ path: outputPath, height: 542 , printBackground: true });
+  await page.pdf({ path: outputPath, height: 542, printBackground: true });
 
   await browser.close();
 
   console.log(`Certificate PDF generated successfully at: ${outputPath}`);
   const pdfBuffer = fs.readFileSync(outputPath);
-  const hash = crypto.createHash('sha256').update(pdfBuffer).digest('hex');
+  const hash = crypto.createHash("sha256").update(pdfBuffer).digest("hex");
   console.log(`SHA-256 Hash of the PDF: ${hash}`);
 }
 
