@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const Users = require("./models/userSchema");
+const Companies = require("./models/companySchema");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
@@ -18,6 +19,78 @@ app.use(cors());
 // Making connection with blockchain network
 blockchain.connectWeb3();
 
+// LOGIN AND SIGNUP FACILITY FOR COMPANIES/ORGANISATIONS
+app.post("/orgRegistration", (req, res) => {
+  const { email, orgName, orgLogo, orgSignature, password } = req.body;
+
+  let hashedPassword;
+
+  bcrypt.hash(password, saltRounds, (err, hash) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+
+    const orgUser = new Companies({
+      email,
+      orgName,
+      orgLogo,
+      orgSignature,
+      password: hash,
+    });
+
+    orgUser
+      .save()
+      .then((obj) => {
+        console.log("Organisation Registered Successfully!");
+        res.status(200).send(obj);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(400).send(err);
+      });
+  });
+});
+
+app.post("/orgLogin", (req, res) => {
+  const { email, password } = req.body;
+
+  Companies.findOne({ email })
+    .then((obj) => {
+      if (!obj) {
+        console.log(err);
+        res.status(500).send("Given Company is not registered");
+      }
+      bcrypt
+        .compare(password, obj.password)
+        .then((match) => {
+          if (!match) {
+            res.status(500).send("Incorrect Password");
+          }
+
+          const token = jwt.sign({ userId: obj._id }, "My_Secret_Key@2024", {
+            expiresIn: "1h",
+          });
+
+          const resObj = {
+            data: obj,
+            token: token,
+          };
+
+          res.status(200).send(obj);
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).send(err);
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send(err);
+    });
+});
+
+// LOGIN AND SING UP FACILITY FOR NORMAL USERS
 app.post("/register", (req, res) => {
   const { email, name, password } = req.body;
 
