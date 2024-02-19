@@ -79,6 +79,8 @@ const generateCertificate = function (
   return self.getAccounts().then((accounts) => {
     let accountAddress = accounts[0];
 
+    console.log(accountAddress);
+
     return certificationInstance
       .deployed()
       .then((instance) => {
@@ -101,6 +103,7 @@ const generateCertificate = function (
 
         // Adjust the gas limit based on the estimation
         const gasLimit = gasEstimate * 2;
+        console.log(gasLimit);
 
         // Now execute the transaction with the adjusted gas limit
         return certificationInstance.deployed().then((instance) => {

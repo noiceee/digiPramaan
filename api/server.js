@@ -8,6 +8,10 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const blockchain = require("./utils/connection");
+const genCertificate = require("./index");
+const crypto = require("crypto");
+const s3 = require("./utils/connect_aws");
+const verifyToken = require("./middlewares/verifyToken");
 
 const app = express();
 const saltRounds = 10;
@@ -131,7 +135,7 @@ app.post("/login", (req, res) => {
             res.status(500).send("Incorrect password");
           }
 
-          const token = jwt.sign({ userId: resObj._id }, "My_Secret_Key@2024", {
+          const token = jwt.sign({ userId: resObj._id }, process.env.JWT_KEY, {
             expiresIn: "1h",
           });
 
@@ -153,7 +157,7 @@ app.post("/login", (req, res) => {
     });
 });
 
-app.post("/generateCertificate", (req, res) => {
+app.post("/generateCertificate", verifyToken, async (req, res) => {
   const {
     eventName,
     dateOfIssuance,
@@ -163,9 +167,51 @@ app.post("/generateCertificate", (req, res) => {
     recipientID,
     organizationID,
     organizationName,
-    hash,
+    userEmail,
   } = req.body;
 
+  // create certificate buffer
+  const certificateBuffer = await genCertificate({
+    eventName,
+    dateOfIssuance,
+    issuerName,
+    issuerID,
+    recieverName,
+    recipientID,
+    organizationID,
+    organizationName,
+  });
+
+  // const folderName = userEmail;
+  // const certificateFileName = uuidv4() + eventName + ".pdf";
+  // const key = `${folderName}/${certificateFileName}`;
+  // const uploadParams = {
+  //   Bucket: process.env.AWS_S3_BUCKET_NAME,
+  //   Key: key,
+  //   Body: certificateBuffer,
+  //   ContentType: "application/pdf",
+  //   ACL: "public-read",
+  // };
+
+  // s3.upload(uploadParams)
+  //   .then((obj) => {
+  //     const data = obj;
+  //     const downloadURL = data.Location;
+  //     console.log("Certificate uploaded to S3 : " + downloadURL);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //     res.status(500).send(err);
+  //   });
+
+  const hash = crypto
+    .createHash("sha256")
+    .update(certificateBuffer)
+    .digest("hex");
+
+  console.log("Certificate Created successfully with hash : " + hash);
+
+  // Storing data on blockchain network
   blockchain
     .generateCertificate(
       eventName,
@@ -208,6 +254,31 @@ app.get("/verifyCertificate/:hash", (req, res) => {
       res.status(400).send({
         err: `No data found for the given certificate hash : ${_hash.hash}`,
       });
+    });
+});
+
+app.get("/getCertificates/:userEmail", verifyToken, (req, res) => {
+  const userEmail = req.params;
+
+  const params = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Prefix: userEmail,
+  };
+
+  s3.listObjectsV2(params)
+    .then((obj) => {
+      const certificateKeys = obj.Contents.map((obj) => obj.Key);
+
+      const downloadURLs = certificateKeys.map((key) => {
+        return `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
+      });
+
+      console.log("Download URLs for certificates:", downloadURLs);
+      res.status(200).send(downloadURLs);
+    })
+    .catch((err) => {
+      console.log("Error retrieving certificates:", err);
+      res.status(500).send(err);
     });
 });
 

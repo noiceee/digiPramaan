@@ -38,6 +38,8 @@ contract Certifications {
             _organizationID,
             _organizationName
         );
+
+        require(bytes(hashes[_hash].eventName).length > 0, "Certificate creation unsuccessful");
     }
 
     function verifyCertification(
