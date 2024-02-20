@@ -12,6 +12,8 @@ const genCertificate = require("./index");
 const crypto = require("crypto");
 const s3 = require("./utils/connect_aws");
 const verifyToken = require("./middlewares/verifyToken");
+const uuidv4 = require("uuid").v4;
+const AWS = require("aws-sdk");
 
 const app = express();
 const saltRounds = 10;
@@ -182,27 +184,25 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     organizationName,
   });
 
-  // const folderName = userEmail;
-  // const certificateFileName = uuidv4() + eventName + ".pdf";
-  // const key = `${folderName}/${certificateFileName}`;
-  // const uploadParams = {
-  //   Bucket: process.env.AWS_S3_BUCKET_NAME,
-  //   Key: key,
-  //   Body: certificateBuffer,
-  //   ContentType: "application/pdf",
-  //   ACL: "public-read",
-  // };
+  const folderName = userEmail;
+  const certificateFileName = uuidv4() + eventName + ".pdf";
+  const key = `${folderName}/${certificateFileName}`;
+  const uploadParams = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: key,
+    Body: certificateBuffer,
+    ContentType: "application/pdf",
+    // ACL: "public-read",
+  };
 
-  // s3.upload(uploadParams)
-  //   .then((obj) => {
-  //     const data = obj;
-  //     const downloadURL = data.Location;
-  //     console.log("Certificate uploaded to S3 : " + downloadURL);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //     res.status(500).send(err);
-  //   });
+  const uploadResult = await s3.upload(uploadParams).promise();
+
+  // Check if the upload was successful
+  if (!uploadResult || !uploadResult.Location) {
+    throw new Error("Failed to upload certificate to AWS S3");
+  }
+
+  console.log("Certificate uploaded to S3:", uploadResult.Location);
 
   const hash = crypto
     .createHash("sha256")
@@ -257,29 +257,35 @@ app.get("/verifyCertificate/:hash", (req, res) => {
     });
 });
 
-app.get("/getCertificates/:userEmail", verifyToken, (req, res) => {
-  const userEmail = req.params;
+app.get("/getCertificates/:userEmail", verifyToken, async (req, res) => {
+  const { userEmail } = req.params;
 
   const params = {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Prefix: userEmail,
+    Prefix: `${userEmail}/`,
   };
 
-  s3.listObjectsV2(params)
-    .then((obj) => {
-      const certificateKeys = obj.Contents.map((obj) => obj.Key);
+  try {
+    const data = await s3.listObjectsV2(params).promise();
 
-      const downloadURLs = certificateKeys.map((key) => {
-        return `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
-      });
+    const certificateKeys = data.Contents.map((obj) => obj.Key);
+    const preSignedUrls = certificateKeys.map((key) => {
+      const urlParams = {
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: key,
+        Expires: 3600,
+      };
 
-      console.log("Download URLs for certificates:", downloadURLs);
-      res.status(200).send(downloadURLs);
-    })
-    .catch((err) => {
-      console.log("Error retrieving certificates:", err);
-      res.status(500).send(err);
+      const url = s3.getSignedUrl("getObject", urlParams);
+      return url;
     });
+
+    console.log("Url links are : ", preSignedUrls);
+    res.status(200).send(preSignedUrls);
+  } catch (error) {
+    console.error("Error retrieving certificates:", error);
+    res.status(500).send("Error retrieving certificates");
+  }
 });
 
 const port = process.env.PORT || 3000;
