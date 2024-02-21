@@ -9,6 +9,7 @@
   "author": "Kartikey Singh & Yash Ambekar",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1555.0",
     "bcrypt": "^5.1.1",
     "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
@@ -24,6 +25,7 @@
     "solc": "^0.8.24",
     "truffle-contract": "^4.0.31",
     "truffle-hdwallet-provider": "^1.0.17",
+    "uuid": "^9.0.1",
     "web3": "^1.8.1"
   }
 }
