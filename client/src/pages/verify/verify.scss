@@ -48,9 +48,30 @@
         }
     }
     .result-img{
-        height: 300px;
+        height: 220px;
         margin: 0px;
         padding: 0px;
         margin-left: -5%;
+        margin-right: 20px;
+    }
+    .content-wrapper{
+        margin-top: 50px;
+        display: flex;
+        align-items: center;
+        .document-info{
+            display: flex;
+            align-items: left;
+            flex-direction: column;
+            gap: 10px;
+            color: greenyellow;
+            font-size: 20px;
+        }
+        .button-wrapper{
+            margin-left: 100px;
+            margin-top: 0px;
+            button{
+                width: 100%;
+            }
+        }
     }
 }

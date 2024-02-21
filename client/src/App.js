@@ -17,6 +17,7 @@ function App() {
         <Switch>
           <Route path="/" element={<Home />}/>
           <Route path="/verify" element={<Verify />}/>
+          <Route path="/signup" element={<Home />}/>
         </Switch>
       <Footer />
       </Router>

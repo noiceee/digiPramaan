@@ -5,7 +5,7 @@ export default function Verify() {
   const [verificationStatus, setVerificationStatus] = useState("VERIFY");
   const inputRef = useRef(null);
   const headingRef = useRef(null);
-  let isCertificateValid = false;
+  let isCertificateValid = true;
   useEffect(() => {
     if (hashAsInput) {
       // Access the current property of the ref to get the input element
@@ -70,15 +70,33 @@ export default function Verify() {
         <></>
       )}
       {verificationStatus == "VALID" ? (
-        <div class="tick-container">
-          <img className="result-img" src="images/tick.gif" alt="" />
+        <div className="content-wrapper">
+          <div class="tick-container">
+            <img className="result-img" src="images/valid.gif" alt="" />
+          </div>
+          <div className="document-info">
+            <span>Certificate ID : {'NA'}</span>
+            <span>Issuer ID : {'NA'}</span>
+            <span>Date of Issuance : {'NA'}</span>
+            <span>CValid Till : {'NA'}</span>
+          </div>
+          <div className="button-wrapper">
+            <button className="cta">Download</button>
+            <button className="cta">Bulk Verify</button>
+          </div>
         </div>
       ) : (
         <></>
       )}
       {verificationStatus == "INVALID" ? (
-        <div class="cross-container">
-          <img className="result-img" src="images/cross.gif" alt="" />
+        <div className="content-wrapper">
+          <div class="cross-container">
+            <img className="result-img" src="images/invalid.gif" alt="" />
+          </div>
+          <div className="button-wrapper">
+            <button className="cta">Verify Again</button>
+            <button className="cta">Bulk Verify</button>
+          </div>
         </div>
       ) : (
         <></>
