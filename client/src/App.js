@@ -8,6 +8,7 @@ import {
   Routes as Switch,
 } from "react-router-dom";
 import Verify from './pages/verify/Verify';
+import Generate from './pages/generate/Generate';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<Home />}/>
           <Route path="/verify" element={<Verify />}/>
           <Route path="/signup" element={<Home />}/>
+          <Route path="/generate" element={<Generate />}/>
         </Switch>
       <Footer />
       </Router>

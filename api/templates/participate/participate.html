@@ -20,6 +20,8 @@ html, body{
     padding: 100px;
     text-align: center;
     position: relative;
+    background-position: center;
+    background-size: cover;
 }
 .certificate>img{
     height: 50px;
@@ -47,9 +49,9 @@ html, body{
   </style>
 </head>
 <body>
-  <div class="certificate">
+  <div class="certificate" style='background-image: url({{backgroundImage}});'>
     <img class="issuer-logo" src="https://dpu.edu.in/img/logo.png"></img>
-    <img class="digi-logo" src="https://media.canva.com/1/image-resize/1/200_200_100_PNG_F/czM6Ly9tZWRpYS1wcml2YXRlLmNhbnZhLmNvbS9SQVpsTS9NQUZ4WE5SQVpsTS8xL3AucG5n?osig=AAAAAAAAAAAAAAAAAAAAAMtOjlVkFRh3267-IUuVuu_ZvSMqUl8Ct4RDv5YV9J0i&exp=1706586199&x-canva-quality=thumbnail&csig=AAAAAAAAAAAAAAAAAAAAAEFZycj99TSeZuF3QhcgbNcbbhW0-zPnoU7Jfi-wlJCv"></img>
+    <img class="digi-logo" src="../logo.png"></img>
     <div class="content-wrapper">
       <h1 class="title">Certificate of Participation</h1>
       <p class="content">

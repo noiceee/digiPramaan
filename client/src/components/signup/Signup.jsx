@@ -61,7 +61,7 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                 return (
                     <div className='step-1'>
                         {/* <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Last Name" required /> */}
-                        <IsIndividualToggle setIsIndividual={setIsIndividual} isIndividual={isIndividual} />
+                        <IsIndividualToggle first={'Individual'} second={'Organization'} setIsIndividual={setIsIndividual} isIndividual={isIndividual} />
                         <button className='cta' onClick={handleNext}>Next</button>
                     </div>
                 );
@@ -117,7 +117,7 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
         <div className="signup" onClick={togglePopUpBox}>
             <div className="glassbox" onClick={(e) => e.stopPropagation()}>
                 <div className="cross" onClick={togglePopUpBox}>+</div>
-                <ProgressBar className="progress-bar" steps={steps} currentStep={step} />
+                <ProgressBar lineWidth={'160px'} stepWidth={'140px'} className="progress-bar" steps={steps} currentStep={step} />
                 {renderStep()}
             </div>
         </div>
