@@ -9,14 +9,16 @@ import {
 } from "react-router-dom";
 import Verify from './pages/verify/Verify';
 import Generate from './pages/generate/Generate';
+import { useState } from 'react';
 
 function App() {
+  const [user, setUser] = useState('INDIVIDUAL');
   return (
     <>
       <Router>
       <Navbar />
         <Switch>
-          <Route path="/" element={<Home />}/>
+          <Route path="/" element={<Home user={user}/>}/>
           <Route path="/verify" element={<Verify />}/>
           <Route path="/signup" element={<Home />}/>
           <Route path="/generate" element={<Generate />}/>
