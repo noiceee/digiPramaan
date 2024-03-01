@@ -1,0 +1,54 @@
+.dash-org {
+    background-color: black;
+    color: white;
+
+    .left {
+
+        .heading {
+            font-size: 80px;
+            letter-spacing: -6px;
+            font-weight: 500;
+            line-height: 60px;
+            opacity: 0;
+            /* Set initial opacity to 0 */
+            animation: fadeIn 1s ease-in-out forwards 0.2s;
+        }
+
+        .button-wrapper {
+            margin-top: 100px;
+            display: flex;
+            flex-direction: column;
+            width: min-content;
+            gap: 20px;
+
+            .cta {
+                white-space: nowrap;
+                padding: 10px 20px;
+                border-radius: 50px;
+                border: none;
+                font-size: 22px;
+                font-weight: 400;
+                cursor: pointer;
+                background-color: var(--strong-pink);
+                color: white;
+                width: min-content;
+
+                &.input {
+                    width: 60vw;
+                }
+            }
+
+            .continue {
+                padding: 20px 40px;
+                background-color: var(--very-light-pink);
+                color: var(--strong-pink);
+                font-size: 30px;
+                transition: all 0.5s ease;
+
+                &:hover {
+                    scale: 1.1;
+                }
+            }
+        }
+    }
+}

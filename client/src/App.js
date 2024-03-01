@@ -10,9 +10,14 @@ import {
 import Verify from './pages/verify/Verify';
 import Generate from './pages/generate/Generate';
 import { useState } from 'react';
+import Manage from './pages/manage/Manage';
 
 function App() {
-  const [user, setUser] = useState('INDIVIDUAL');
+  const tempUser = {
+    name: "Kartikey Singh",
+    type: 'ORGANIZATION'
+  }
+  const [user, setUser] = useState(tempUser);
   return (
     <>
       <Router>
@@ -22,6 +27,7 @@ function App() {
           <Route path="/verify" element={<Verify />}/>
           <Route path="/signup" element={<Home />}/>
           <Route path="/generate" element={<Generate />}/>
+          <Route path="/manage" element={<Manage />}/>
         </Switch>
       <Footer />
       </Router>

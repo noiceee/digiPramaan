@@ -6,18 +6,18 @@ import './home.scss';
 export default function Home({ user }) {
     console.log("From Landing")
     const renderHome = () => {
-        switch (user) {
+        switch (user.type) {
             case null:
                 return (
                     <Landing />
                 );
             case 'INDIVIDUAL':
                 return (
-                    <DashInd />
+                    <DashInd user={user}/>
                 );
             case 'ORGANIZATION':
                 return (
-                    <DashOrg />
+                    <DashOrg user={user}/>
                 );
             default:
                 return null;
