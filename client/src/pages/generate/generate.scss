@@ -45,6 +45,18 @@
         .togglecontainer{
             margin-top: -30px;
         }
+        .preview-heading{
+            align-self: flex-start;
+            font-size: 24px;
+        }
+        .preview{
+            margin-top: 20px;
+            min-height: 500px;
+            width: 100%;
+            .certificate{
+                height: 600px;
+            }
+        }
     }
     .input-wrapper{
         display: flex;
