@@ -1,3 +1,4 @@
+import axios from 'axios';
 import IsIndividualToggle from '../isIndividualToggle/IsIndividualToggle';
 import ProgressBar from '../progressBar/ProgressBar';
 import './signup.scss';
@@ -43,9 +44,20 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
     };
     const handleSubmit = (e) => {
         e.preventDefault();
+        registerIndividual();
         console.log('Form submitted:', formData);
         if (step < 5) {
             setStep(prevStep => prevStep + 1);
+        }
+    };
+
+    const registerIndividual = async () => {
+        try {
+            const response = await axios.post('http://localhost:8080/register', formData);
+            console.log(response);
+            setIsOnSignup(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
     };
 

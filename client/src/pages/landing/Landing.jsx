@@ -37,8 +37,7 @@ export default function Landing({ user, setUser }) {
         setIsIndividual((prev) => !prev)
     }
 
-    const signInindividual = async () => {
-        console.log("Caleeedddd@@@@@@");
+    const signIn = async (type) => {
         try {
             const response = await axios.post('http://localhost:8080/login', {
                 email: emailRef.current.value,
@@ -46,7 +45,7 @@ export default function Landing({ user, setUser }) {
             });
             const tempUser = {
                 token: response.data.token,
-                type: 'INDIVIDUAL',
+                type: type,
                 ...response.data.data
             }
             const { password, ...userWithoutPassword } = tempUser;
@@ -77,7 +76,7 @@ export default function Landing({ user, setUser }) {
                             <input placeholder="Email" type="email" name="email" id="email" ref={emailRef} />
                             <input placeholder="Password" type="password" id="password" ref={passwordRef} />
                         </div>
-                        <button className="sign-in-button" onClick={isIndividual ? signInindividual : handleTabSwitch}>Sign In</button>
+                        <button className="sign-in-button" onClick={isIndividual ? () => signIn('INDIVIDUAL') : () => signIn('ORGANIZATION')}>Sign In</button>
                         <span className="sign-up">New User? <span onClick={() => {
                             setIsOnSignup((prev) => !prev);
                         }}>Sign Up Here</span></span>
