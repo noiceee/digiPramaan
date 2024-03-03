@@ -69,6 +69,21 @@
             border-radius: 5px;
             font-size: 18px;
         }
+        h4{
+            width: 400px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .image-input{
+            display:flex;
+            align-items: center;
+            gap: 20px;
+            input{
+                font-size: 16px;
+                padding: 8px;
+                width: 300px;
+            }
+        }
       }
     .step-1{
         display: flex;
@@ -79,7 +94,7 @@
         }
     }
     .step-2{
-       
+      width: 300px;
     }
   }
 }

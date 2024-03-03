@@ -37,21 +37,40 @@ export default function Landing({ user, setUser }) {
         setIsIndividual((prev) => !prev)
     }
 
-    const signIn = async (type) => {
+    const signInIndividual = async () => {
         try {
-            const response = await axios.post('http://localhost:8080/login', {
+            const response = await axios.post(`http://localhost:8080/INDIVIDUAL`, {
                 email: emailRef.current.value,
                 password: passwordRef.current.value
             });
+            console.log(response)
             const tempUser = {
                 token: response.data.token,
-                type: type,
+                type: 'INDIVIDUAL',
                 ...response.data.data
             }
             const { password, ...userWithoutPassword } = tempUser;
             console.log(userWithoutPassword);
             localStorage.setItem('user', JSON.stringify(userWithoutPassword));
             setUser(userWithoutPassword);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    const signInOrganization = async () => {
+        try {
+            const response = await axios.post(`http://localhost:8080/orgLogin`, {
+                email: emailRef.current.value,
+                password: passwordRef.current.value
+            });
+            console.log(response)
+            const tempUser = {
+                type: 'ORGANIZATION',
+                ...response.data
+            }
+            localStorage.setItem('user', JSON.stringify(tempUser));
+            setUser(tempUser);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -76,7 +95,7 @@ export default function Landing({ user, setUser }) {
                             <input placeholder="Email" type="email" name="email" id="email" ref={emailRef} />
                             <input placeholder="Password" type="password" id="password" ref={passwordRef} />
                         </div>
-                        <button className="sign-in-button" onClick={isIndividual ? () => signIn('INDIVIDUAL') : () => signIn('ORGANIZATION')}>Sign In</button>
+                        <button className="sign-in-button" onClick={isIndividual ? signInIndividual : signInOrganization}>Sign In</button>
                         <span className="sign-up">New User? <span onClick={() => {
                             setIsOnSignup((prev) => !prev);
                         }}>Sign Up Here</span></span>

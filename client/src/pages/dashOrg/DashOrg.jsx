@@ -6,7 +6,7 @@ export default function DashOrg({ user }) {
         <div className="dash-org page">
             <div className="left">
                 <h1 className="heading">
-                    Welcome,<br></br> {user.name.split(" ")[0]}!
+                    Welcome,<br></br> {user.orgName}!
                 </h1>
                 <div className="button-wrapper">
                     <Link to={"/verify"}>
