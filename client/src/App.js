@@ -15,17 +15,17 @@ import Manage from './pages/manage/Manage';
 function App() {
   const tempUser = {
     name: "Kartikey Singh",
-    type: 'ORGANIZATION'
+    type: 'INDIVIDUAL'
   }
-  const [user, setUser] = useState(tempUser);
+  const [user, setUser] = useState({type: null});
   return (
     <>
       <Router>
       <Navbar />
         <Switch>
-          <Route path="/" element={<Home user={user}/>}/>
+          <Route path="/" element={<Home user={user} setUser={setUser}/>}/>
           <Route path="/verify" element={<Verify />}/>
-          <Route path="/signup" element={<Home />}/>
+          <Route path="/signup" element={<Home user={user} setUser={setUser}/>}/>
           <Route path="/generate" element={<Generate />}/>
           <Route path="/manage" element={<Manage />}/>
         </Switch>

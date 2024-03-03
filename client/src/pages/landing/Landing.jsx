@@ -1,20 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./landing.scss";
 import { Link } from "react-router-dom";
 import Signup from "../../components/signup/Signup";
+import axios from 'axios';
 
-export default function Landing({user}) {
+export default function Landing({ user, setUser }) {
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [isOnSignin, setIsOnSignin] = useState(false);
     const [isOnSignup, setIsOnSignup] = useState(false);
     const [isIndividual, setIsIndividual] = useState(true);
-    useEffect(()=>{
-        if(window.location.pathname == '/signup'){
-            setIsOnSignin(true);
-        } else {
-            setIsOnSignin(false);
-        }
-    });
+    const emailRef = useRef(null);
+    const passwordRef = useRef(null);
+    // useEffect(() => {
+    //     if (window.location.pathname == '/signup') {
+    //         setIsOnSignin(true);
+    //     } else {
+    //         setIsOnSignin(false);
+    //     }
+    // });
     useEffect(() => {
         const handleMouseMove = (event) => {
             const { clientX, clientY } = event;
@@ -31,8 +34,29 @@ export default function Landing({user}) {
     }, []);
 
     const handleTabSwitch = () => {
-        setIsIndividual((prev)=>!prev)
+        setIsIndividual((prev) => !prev)
     }
+
+    const signInindividual = async () => {
+        console.log("Caleeedddd@@@@@@");
+        try {
+            const response = await axios.post('http://localhost:8080/login', {
+                email: emailRef.current.value,
+                password: passwordRef.current.value
+            });
+            const tempUser = {
+                token: response.data.token,
+                type: 'INDIVIDUAL',
+                ...response.data.data
+            }
+            const { password, ...userWithoutPassword } = tempUser;
+            console.log(userWithoutPassword);
+            localStorage.setItem('user', userWithoutPassword);
+            setUser(userWithoutPassword);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
 
     return (
         <div className="home page">
@@ -42,20 +66,20 @@ export default function Landing({user}) {
                         {/* <span className='back-button' onClick={()=>{
                             setIsOnSignin(prev => !prev);
                         }}>{'<'}</span> */}
-                        <Link to={'/'}>
-                            <span className="back-button">{'<'}</span>
-                        </Link>
+                            <span className="back-button" onClick={()=>{
+                                setIsOnSignin(false);
+                            }}>{'<'}</span>
                         <div className="tab-wrapper">
                             <span className={isIndividual ? "active" : ''} onClick={handleTabSwitch}>Individual</span>
                             <span className={isIndividual ? '' : "active"} onClick={handleTabSwitch}>Organisation</span>
                         </div>
                         <div className="input-wrapper">
-                            <input placeholder="Email" type="email" name="email" id="email" />
-                            <input placeholder="Password" type="password" id="password"/>
+                            <input placeholder="Email" type="email" name="email" id="email" ref={emailRef} />
+                            <input placeholder="Password" type="password" id="password" ref={passwordRef} />
                         </div>
-                        <button className="sign-in-button">Sign In</button>
-                        <span className="sign-up">New User? <span onClick={()=>{
-                            setIsOnSignup((prev)=>!prev);
+                        <button className="sign-in-button" onClick={isIndividual ? signInindividual : handleTabSwitch}>Sign In</button>
+                        <span className="sign-up">New User? <span onClick={() => {
+                            setIsOnSignup((prev) => !prev);
                         }}>Sign Up Here</span></span>
                     </div>
                 ) : (
@@ -74,9 +98,9 @@ export default function Landing({user}) {
                                     setIsOnSignin(!prev);
                                 })
                             }}>SIGN IN</button> */}
-                            <Link to={"/signup"}>
-                                <button>SIGN UP</button>
-                            </Link>
+                                <button onClick={()=>(
+                                    setIsOnSignin(true)
+                                )}>SIGN IN</button>
                             <Link to={"/verify"}>
                                 <button>VERIFY</button>
                             </Link>
@@ -117,7 +141,7 @@ export default function Landing({user}) {
                 />
             </div>
             {
-                isOnSignup && <Signup setIsOnSignup={setIsOnSignup} isOnSignup={isOnSignup}/>
+                isOnSignup && <Signup setIsOnSignup={setIsOnSignup} isOnSignup={isOnSignup} />
             }
         </div>
     );

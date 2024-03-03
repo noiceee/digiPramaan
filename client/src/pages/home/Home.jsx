@@ -3,13 +3,12 @@ import DashOrg from '../dashOrg/DashOrg';
 import Landing from '../landing/Landing';
 import './home.scss';
 
-export default function Home({ user }) {
-    console.log("From Landing")
+export default function Home({ user, setUser }) {
     const renderHome = () => {
-        switch (user.type) {
+        switch (user?.type) {
             case null:
                 return (
-                    <Landing />
+                    <Landing setUser={setUser}/>
                 );
             case 'INDIVIDUAL':
                 return (
