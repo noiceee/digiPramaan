@@ -51,7 +51,7 @@ export default function Landing({ user, setUser }) {
             }
             const { password, ...userWithoutPassword } = tempUser;
             console.log(userWithoutPassword);
-            localStorage.setItem('user', userWithoutPassword);
+            localStorage.setItem('user', JSON.stringify(userWithoutPassword));
             setUser(userWithoutPassword);
         } catch (error) {
             console.error('Error fetching data:', error);

@@ -13,15 +13,12 @@ import { useState } from 'react';
 import Manage from './pages/manage/Manage';
 
 function App() {
-  const tempUser = {
-    name: "Kartikey Singh",
-    type: 'INDIVIDUAL'
-  }
-  const [user, setUser] = useState({type: null});
+  const tempUser = JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState(tempUser);
   return (
     <>
       <Router>
-      <Navbar />
+      <Navbar user={user} setUser={setUser}/>
         <Switch>
           <Route path="/" element={<Home user={user} setUser={setUser}/>}/>
           <Route path="/verify" element={<Verify />}/>

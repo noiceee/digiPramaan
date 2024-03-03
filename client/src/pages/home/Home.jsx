@@ -6,10 +6,6 @@ import './home.scss';
 export default function Home({ user, setUser }) {
     const renderHome = () => {
         switch (user?.type) {
-            case null:
-                return (
-                    <Landing setUser={setUser}/>
-                );
             case 'INDIVIDUAL':
                 return (
                     <DashInd user={user}/>
@@ -19,7 +15,9 @@ export default function Home({ user, setUser }) {
                     <DashOrg user={user}/>
                 );
             default:
-                return null;
+                return (
+                    <Landing setUser={setUser}/>
+                );
         }
     };
     return (
