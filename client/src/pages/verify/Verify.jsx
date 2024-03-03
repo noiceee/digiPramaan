@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import "./verify.scss";
+import axios from "axios";
 export default function Verify() {
   const [hashAsInput, setInput] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState("VERIFY");
@@ -19,12 +20,16 @@ export default function Verify() {
   function initiateVerification() {
     //Make call
     setVerificationStatus("VERIFYING");
-    setTimeout(() => {
-      isCertificateValid
-        ? // Do something with the current value, for example, update the state
-          setVerificationStatus("VALID")
-        : setVerificationStatus("INVALID");
-    }, 1000); // 10 seconds timeout
+    const verify = async () => {
+      try {
+          const response = await axios.get(`http://localhost:8080/verifyCertificate/${inputRef.current.value}`);
+          if(response)setVerificationStatus("VALID");
+      } catch (error) {
+        setVerificationStatus("INVALID");
+          console.error('Error fetching data:', error);
+      }
+  };
+  verify();
   }
   useEffect(() => {
     if (verificationStatus == "VERIFYING") {
