@@ -66,11 +66,14 @@ export default function Landing({ user, setUser }) {
             });
             console.log(response)
             const tempUser = {
+                token: response.data.token,
                 type: 'ORGANIZATION',
-                ...response.data
+                ...response.data.data
             }
-            localStorage.setItem('user', JSON.stringify(tempUser));
-            setUser(tempUser);
+            const { password, ...userWithoutPassword } = tempUser;
+            console.log(userWithoutPassword);
+            localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+            setUser(userWithoutPassword);
         } catch (error) {
             console.error('Error fetching data:', error);
         }

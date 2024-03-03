@@ -83,7 +83,7 @@ app.post("/orgLogin", (req, res) => {
             token: token,
           };
 
-          res.status(200).send(obj);
+          res.status(200).send(resObj);
         })
         .catch((err) => {
           console.log(err);
