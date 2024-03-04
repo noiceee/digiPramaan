@@ -39,7 +39,7 @@ export default function Landing({ user, setUser }) {
 
     const signInIndividual = async () => {
         try {
-            const response = await axios.post(`http://localhost:8080/INDIVIDUAL`, {
+            const response = await axios.post(`http://localhost:8080/login`, {
                 email: emailRef.current.value,
                 password: passwordRef.current.value
             });
