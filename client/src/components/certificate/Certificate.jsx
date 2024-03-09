@@ -14,9 +14,10 @@ function Certificate({ backgroundImage, receiverName, eventName, organizationNam
           Organized by {organizationName}
         </p>
         <div className="certificate-info" style={{ textAlign: 'left', marginTop: '100px' }}>
-          <div className="issuer-info">Issued by: {issuerName} (Issuer ID: {issuerID})</div>
+          {/* <div className="issuer-info">Issued by: {issuerName} (Issuer ID: {issuerID})</div> */}
           <div className="organization-id">Organization ID: {organizationID}</div>
-          <div className="recipient-id">Received by: {receiverName} (Recipient ID: {recipientID})</div>
+          <div className="recipient-id">Received by: {receiverName}</div>
+          <div className="recipient-id">Recipient ID: {recipientID}</div>
           <div className="issuer-info">Date of Issuance: {dateOfIssuance}</div>
         </div>
       </div>
