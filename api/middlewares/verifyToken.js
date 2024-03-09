@@ -11,9 +11,10 @@ const verifyToken = function (req, res, next) {
   jwt.verify(token, process.env.JWT_KEY, function (err, decoded) {
     if (err) {
       console.log(err);
-      return res
-        .status(500)
-        .send({ auth: false, message: "Failed to authenticate!!" });
+      return res.status(500).send({
+        auth: false,
+        message: "Failed to authenticate!!",
+      });
     }
 
     req.userId = decoded.id;
