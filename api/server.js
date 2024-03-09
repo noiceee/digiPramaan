@@ -25,6 +25,36 @@ app.use(cors());
 // Making connection with blockchain network
 blockchain.connectWeb3();
 
+// Upload Image to AWS bucket
+app.post("/uploadImage", async (req, res) => {
+  const { file } = req.body;
+  const key = uuidv4() + ".jpeg";
+
+  const params = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: key,
+    Body: file,
+    ContentType: "image/jpeg",
+    ACL: "public-read",
+  };
+
+  try {
+    const data = await s3.upload(params).promise();
+
+    const urlParams = s3.getSignedUrl("getObject", {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: key,
+    });
+
+    const signedURL = s3.getSignedUrl("getObject", urlParams);
+
+    res.send({ success: true, url: signedUrl });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false, message: "Failed to upload image" });
+  }
+});
+
 // LOGIN AND SIGNUP FACILITY FOR COMPANIES/ORGANISATIONS
 app.post("/orgRegistration", (req, res) => {
   const { email, orgName, orgLogo, orgSignature, password } = req.body;
@@ -74,13 +104,13 @@ app.post("/orgLogin", (req, res) => {
             res.status(500).send("Incorrect Password");
           }
 
-          const token = jwt.sign({ userId: obj._id }, "My_Secret_Key@2024", {
+          const Token = jwt.sign({ userId: obj._id }, process.env.JWT_KEY, {
             expiresIn: "1h",
           });
 
           const resObj = {
             data: obj,
-            token: token,
+            token: Token,
           };
 
           res.status(200).send(resObj);
@@ -172,6 +202,17 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     userEmail,
   } = req.body;
 
+  const token = req.headers["authorization"];
+  // fetching issuer data from the database
+
+  try {
+    const userId = req.userId;
+
+    Users.findOne({ userId }).then((obj) => {});
+  } catch (err) {
+    console.log(err);
+  }
+
   // create certificate buffer
   const certificateBuffer = await genCertificate({
     eventName,
@@ -192,7 +233,7 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     Key: key,
     Body: certificateBuffer,
     ContentType: "application/pdf",
-    // ACL: "public-read",
+    ACL: "public-read",
   };
 
   const uploadResult = await s3.upload(uploadParams).promise();
@@ -273,7 +314,7 @@ app.get("/getCertificates/:userEmail", verifyToken, async (req, res) => {
       const urlParams = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         Key: key,
-        Expires: 3600,
+        Expires: 36000,
       };
 
       const url = s3.getSignedUrl("getObject", urlParams);

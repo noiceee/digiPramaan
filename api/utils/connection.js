@@ -79,8 +79,6 @@ const generateCertificate = function (
   return self.getAccounts().then((accounts) => {
     let accountAddress = accounts[0];
 
-    console.log(accountAddress);
-
     return certificationInstance
       .deployed()
       .then((instance) => {

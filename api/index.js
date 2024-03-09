@@ -2,7 +2,10 @@ const puppeteer = require("puppeteer");
 const fs = require("fs");
 
 async function genCertificate(jsonData) {
-  const htmlTemplate = fs.readFileSync("./templates/participate.html", "utf-8");
+  const htmlTemplate = fs.readFileSync(
+    "./templates/participate/participate.html",
+    "utf-8"
+  );
   const htmlContent = htmlTemplate
     .replace("{{eventName}}", jsonData.eventName)
     .replace("{{dateOfIssuance}}", jsonData.dateOfIssuance)
