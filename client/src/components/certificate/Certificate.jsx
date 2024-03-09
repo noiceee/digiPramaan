@@ -3,7 +3,7 @@ import React from 'react';
 function Certificate({ backgroundImage, receiverName, eventName, organizationName, issuerName, issuerID, organizationID, recipientID, dateOfIssuance }) {
     console.log(receiverName)
     return (
-    <div className="certificate" style={{ backgroundColor: 'rgb(255, 203, 139)', padding: '100px', textAlign: 'center', position: 'relative', backgroundPosition: 'center', backgroundSize: 'cover', width: '900px', maxHeight: '500px' , backgroundImage: `url(${backgroundImage})`}}>
+    <div className="certificate" style={{ backgroundColor: 'rgb(240, 197, 145)', padding: '100px', textAlign: 'center', position: 'relative', backgroundPosition: 'center', backgroundSize: 'cover', width: '900px', maxHeight: '500px' , backgroundImage: `url(${backgroundImage})`}}>
       <img className="issuer-logo" src="https://dpu.edu.in/img/logo.png" alt="Issuer Logo" style={{ height: '50px', position: 'absolute', left: '10px', top: '10px' }} />
       <img className="digi-logo" src="images/logo.png" alt="Digi Logo" style={{ height: '250px', position: 'absolute', right: '-30px', top: '-80px' }} />
       <div className="content-wrapper">

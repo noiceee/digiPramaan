@@ -18,7 +18,6 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        phone: '',
         password: '',
         confirmPassword: '',
         isIndividual: ''
@@ -47,7 +46,7 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         isIndividual ?
-        registerIndividual() : registerOrganization();
+            registerIndividual() : registerOrganization();
         console.log('Form submitted:', formData);
         if (step < 5) {
             setStep(prevStep => prevStep + 1);
@@ -85,6 +84,7 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                 ...prevData,
                 [name]: value
             }));
+            handleUpload(file);
         };
 
         if (file) {
@@ -103,10 +103,27 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                 ...prevData,
                 [name]: value
             }));
+            handleUpload(file);
         };
 
         if (file) {
             reader.readAsDataURL(file);
+        }
+    };
+
+    const handleUpload = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await axios.post('http://localhost:8080/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log('Image uploaded:', response.data.url);
+        } catch (error) {
+            console.error('Error uploading image:', error);
         }
     };
 
@@ -139,7 +156,8 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                     <div className='step-2'>
                         <div className="input-wrapper">
                             <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
-                            <input style={{ '-moz-appearance': 'textfield', 'appearance': 'textField' }} type="number" placeholder='Phone number' value={formData.phone} name='phone' onChange={handleChange} />
+                            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
+                            {/* <input style={{ '-moz-appearance': 'textfield', 'appearance': 'textField' }} type="number" placeholder='Phone number' value={formData.phone} name='phone' onChange={handleChange} /> */}
                         </div>
                         <div className="button-wrapper">
                             <button className='cta' onClick={handleBack}>Back</button>
@@ -151,7 +169,6 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                 return (
                     <div className='step-2'>
                         <div className="input-wrapper">
-                            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
                             <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
                             <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirm Password" required />
                         </div>
@@ -163,10 +180,10 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                 );
             case 4:
                 return (
-                    <div>
+                    <div className='last-step'>
                         <p>Please review your information before submitting:</p>
-                        <p>Name: {formData.name}</p>
-                        <p>Email: {formData.email}</p>
+                        <p>Name : {formData.name}</p>
+                        <p>Email : {formData.email}</p>
                         <div className="button-wrapper">
                             <button className='cta' onClick={handleBack}>Back</button>
                             <button className='cta' onClick={handleSubmit}>Submit</button>
@@ -205,7 +222,7 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                                     name="orgLogo"
                                     id="orgLogo"
                                     accept="image/"
-                                    onChange={handleSignChange}
+                                    onChange={handleImageChange}
                                 />
                                 {orgLogo && (
                                     <div>
@@ -238,7 +255,7 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                                         name="orgSignature"
                                         id="orgSignature"
                                         accept="image/"
-                                        onChange={handleImageChange}
+                                        onChange={handleSignChange}
                                     />
                                     {orgLogo && (
                                         <div>
@@ -263,10 +280,40 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                 );
             case 4:
                 return (
-                    <div>
+                    <div className='last-step'>
                         <p>Please review your information before submitting:</p>
-                        <p>Organization Name: {formData.orgName}</p>
-                        <p>Email: {formData.email}</p>
+                        <p>Organization Name : {formData.orgName}</p>
+                        <p>Email : {formData.email}</p>
+                        <div className="image-wrapper">
+                            <div className="image-input">
+                                {orgLogo && (
+                                    <div>
+                                        <p>
+                                            Organization Logo :
+                                        </p>
+                                        <img
+                                            src={orgLogo}
+                                            alt="Uploaded"
+                                            style={{ maxWidth: "100px" }}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="image-input">
+                                {orgSignature && (
+                                    <div>
+                                        <p>
+                                            Organization Signature :
+                                        </p>
+                                        <img
+                                            src={orgSignature}
+                                            alt="Uploaded"
+                                            style={{ maxWidth: "100px" }}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                         <div className="button-wrapper">
                             <button className='cta' onClick={handleBack}>Back</button>
                             <button className='cta' onClick={handleSubmit}>Submit</button>
