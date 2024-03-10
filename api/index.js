@@ -3,14 +3,12 @@ const fs = require("fs");
 
 async function genCertificate(jsonData) {
   const htmlTemplate = fs.readFileSync(
-    "./templates/participate/participate.html",
+    `./templates/${jsonData.template}.html`,
     "utf-8"
   );
   const htmlContent = htmlTemplate
     .replace("{{eventName}}", jsonData.eventName)
     .replace("{{dateOfIssuance}}", jsonData.dateOfIssuance)
-    .replace("{{issuerName}}", jsonData.issuerName)
-    .replace("{{issuerID}}", jsonData.issuerID)
     .replaceAll("{{recieverName}}", jsonData.recieverName)
     .replace("{{recipientID}}", jsonData.recipientID)
     .replace("{{organizationID}}", jsonData.organizationID)

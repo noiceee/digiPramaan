@@ -96,7 +96,6 @@ app.post("/orgLogin", (req, res) => {
   Companies.findOne({ email })
     .then((obj) => {
       if (!obj) {
-        console.log(err);
         res.status(500).send("Given Company is not registered");
       }
       bcrypt
@@ -106,9 +105,11 @@ app.post("/orgLogin", (req, res) => {
             res.status(500).send("Incorrect Password");
           }
 
-          const Token = jwt.sign({ userId: obj._id }, process.env.JWT_KEY, {
-            expiresIn: "1h",
-          });
+          const expirationTime = new Date().getTime() + 1 * 60 * 60 * 1000;
+          const Token = jwt.sign(
+            { userId: obj._id, exp: expirationTime },
+            process.env.JWT_KEY
+          );
 
           const resObj = {
             data: obj,
@@ -169,9 +170,11 @@ app.post("/login", (req, res) => {
             res.status(500).send("Incorrect password");
           }
 
-          const token = jwt.sign({ userId: resObj._id }, process.env.JWT_KEY, {
-            expiresIn: "1h",
-          });
+          const expirationTime = new Date().getTime() + 1 * 60 * 60 * 1000;
+          const token = jwt.sign(
+            { userId: resObj._id, exp: expirationTime },
+            process.env.JWT_KEY
+          );
 
           const responseObject = {
             data: resObj,
@@ -192,39 +195,65 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/generateCertificate", verifyToken, async (req, res) => {
-  const {
-    eventName,
-    dateOfIssuance,
-    issuerName,
-    issuerID,
-    recieverName,
-    recipientID,
-    organizationID,
-    organizationName,
-    userEmail,
-  } = req.body;
+  const { eventName, recieverName, userEmail, template } = req.body;
 
   const token = req.headers["authorization"];
+
   // fetching issuer data from the database
-
+  let issuerData;
   try {
-    const userId = req.userId;
+    const decoded = jwt.verify(token, process.env.JWT_KEY);
+    const userId = decoded.userId;
 
-    Users.findOne({ userId }).then((obj) => {});
+    if (!userId) {
+      throw new Error("User ID is undefined or null");
+    }
+    issuerData = await Companies.findOne({ _id: userId })
+      .then((obj) => {
+        if (obj) {
+          return obj;
+        } else {
+          throw err;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        throw err;
+      });
   } catch (err) {
     console.log(err);
+    res.status(500).send("Not a registered Organization user!");
   }
+
+  // Creating the required variable for creation of certificates
+  const dateOfIssuance = new Date().toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+  const organizationName = issuerData.orgName;
+  const organizationID = issuerData._id;
+  const recipientID = uuidv4();
+
+  res.send({
+    organizationName: organizationName,
+    organizationID: organizationID,
+    recieverName: recieverName,
+    recipientID: recipientID,
+    dateOfIssuance: dateOfIssuance,
+    eventName: eventName,
+    userEmail: userEmail,
+  });
 
   // create certificate buffer
   const certificateBuffer = await genCertificate({
     eventName,
     dateOfIssuance,
-    issuerName,
-    issuerID,
     recieverName,
     recipientID,
     organizationID,
     organizationName,
+    template,
   });
 
   const folderName = userEmail;
@@ -235,7 +264,6 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     Key: key,
     Body: certificateBuffer,
     ContentType: "application/pdf",
-    ACL: "public-read",
   };
 
   const uploadResult = await s3.upload(uploadParams).promise();
@@ -284,20 +312,20 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     });
 });
 
-app.get("/verifyCertificate/:hash", (req, res) => {
-  const _hash = req.params;
+// Error handeling done
+app.get("/verifyCertificate/:hash", async (req, res) => {
+  const _hash = req.params.hash; // Access the hash from params
 
-  blockchain
-    .verifyCertificate(_hash.hash)
-    .then((obj) => {
-      res.status(200).send(obj);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(400).send({
-        err: `No data found for the given certificate hash : ${_hash.hash}`,
-      });
+  try {
+    const obj = await blockchain.verifyCertificate(_hash);
+    console.log("Here");
+    res.status(200).send(obj);
+  } catch (err) {
+    console.log(err);
+    res.status(400).send({
+      err: `No data found for the given certificate hash : ${_hash}`,
     });
+  }
 });
 
 app.get("/getCertificates/:userEmail", verifyToken, async (req, res) => {

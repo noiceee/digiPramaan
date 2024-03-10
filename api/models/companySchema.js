@@ -6,10 +6,6 @@ const companySchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  isIndividual: {
-    type: Boolean,
-    required: true,
-  },
   orgName: {
     type: String,
     required: true,
