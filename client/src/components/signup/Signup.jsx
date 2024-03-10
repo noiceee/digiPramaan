@@ -13,12 +13,6 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
     const [isIndividual, setIsIndividual] = useState(true);
     const [orgLogo, setorgLogo] = useState(null);
     const [orgSignature, setOrgSignature] = useState(null);
-    useEffect(() => {
-        setFormData(prevData => ({
-            ...prevData,
-            isIndividual
-        }))
-    }, [isIndividual]);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -26,6 +20,12 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
         confirmPassword: '',
         isIndividual: ''
     });
+    useEffect(() => {
+        setFormData(prevData => ({
+            ...prevData,
+            isIndividual
+        }))
+    }, [isIndividual]);
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevData => ({
@@ -88,7 +88,12 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                 ...prevData,
                 [name]: value
             }));
-            handleUpload(file);
+            handleUpload(file).then(url => {
+                setFormData(prev => ({
+                    ...prev,
+                    orgLogo: url
+                }))
+            });
         };
 
         if (file) {
@@ -107,7 +112,12 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                 ...prevData,
                 [name]: value
             }));
-            handleUpload(file);
+            handleUpload(file).then(url => {
+                setFormData(prev => ({
+                    ...prev,
+                    orgSignature: url
+                }))
+            });
         };
 
         if (file) {
@@ -116,10 +126,10 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
     };
 
     const handleUpload = async (file) => {
-    
+
         if (!validFileTypes.find(type => type === file.type)) {
-        //   setError('File must be in JPG/PNG format');
-          return;
+            //   setError('File must be in JPG/PNG format');
+            return;
         }
 
         const form = new FormData();
@@ -131,10 +141,20 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log('Image uploaded:', response.data.url);
+            if (response.data.url instanceof Promise) {
+                const url = await response.data.url;
+                console.log("lmaoooooo");
+                console.log('Image uploaded:', url); // This should log the final URL
+                return url;
+            } else {
+                console.log('Image uploaded:', response.data.url); // This should log the final URL
+                return response.data.url;
+            }
         } catch (error) {
             console.error('Error uploading image:', error);
-        }
+            // Handle errors
+        }        
+        
     };
 
     const stepsIndividual = [
