@@ -57,7 +57,8 @@ app.post("/uploadImage", async (req, res) => {
 
 // LOGIN AND SIGNUP FACILITY FOR COMPANIES/ORGANISATIONS
 app.post("/orgRegistration", (req, res) => {
-  const { email, orgName, orgLogo, orgSignature, password } = req.body;
+  const { email, isIndividual, orgName, orgLogo, orgSignature, password } =
+    req.body;
 
   let hashedPassword;
 
@@ -69,6 +70,7 @@ app.post("/orgRegistration", (req, res) => {
 
     const orgUser = new Companies({
       email,
+      isIndividual,
       orgName,
       orgLogo,
       orgSignature,
