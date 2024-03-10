@@ -14,7 +14,7 @@ const s3 = require("./utils/connect_aws");
 const verifyToken = require("./middlewares/verifyToken");
 const uuidv4 = require("uuid").v4;
 const AWS = require("aws-sdk");
-const multer = require('multer');
+const multer = require("multer");
 
 const app = express();
 const saltRounds = 10;
@@ -28,7 +28,7 @@ app.use(cors());
 blockchain.connectWeb3();
 
 // Upload Image to AWS bucket
-app.post("/uploadImage", upload.single('image'), async (req, res) => {
+app.post("/uploadImage", upload.single("image"), async (req, res) => {
   // console.log(req.body);
   const image = req.file.buffer;
   const key = "fed.jpg";
@@ -237,15 +237,9 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
   const organizationID = issuerData._id;
   const recipientID = uuidv4();
 
-  res.send({
-    organizationName: organizationName,
-    organizationID: organizationID,
-    recieverName: recieverName,
-    recipientID: recipientID,
-    dateOfIssuance: dateOfIssuance,
-    eventName: eventName,
-    userEmail: userEmail,
-  });
+  console.log(issuerData);
+
+  /*
 
   // create certificate buffer
   const certificateBuffer = await genCertificate({
@@ -312,6 +306,7 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
       console.log(err);
       res.status(500).send(err);
     });
+    */
 });
 
 // Error handeling done
