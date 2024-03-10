@@ -96,6 +96,26 @@
     .step-2{
       width: 300px;
     }
+    .last-step{
+      margin-top: 10px;
+      p{
+        font-size: 20px;
+        text-align: left;
+        margin-bottom: 5px;
+        &:first-of-type{
+          margin-bottom: 12px;
+        }
+      }
+      .image-wrapper{
+        display: flex;
+        gap: 100px;
+        margin-top: 20px;
+        align-items: start;
+        p{
+          font-size: 16px;
+        }
+      }
+    }
   }
 }
 

@@ -49,26 +49,49 @@ export default function Generate() {
     }, [backgroundImage]);
     const handleChange = (e) => {
         const { name, value } = e.target;
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 because month is zero-based
+        const day = String(currentDate.getDate()).padStart(2, '0');
+
+        const formattedDate = `${day}-${month}-${year}`;
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
+            dateOfIssuance: formattedDate
         }));
     };
+
     const handleNext = (e) => {
         e.preventDefault();
         console.log("Form submitted:", formData);
         setStep((prevStep) => prevStep + 1);
     };
+
     const handleBack = (e) => {
         console.log("Form submitted:", formData);
         setStep((prevStep) => prevStep - 1);
     };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log("Form submitted:", formData);
 
         setPublished(true);
     };
+
+    const setDate = () => {
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 because month is zero-based
+        const day = String(currentDate.getDate()).padStart(2, '0');
+
+        const formattedDate = `${day}-${month}-${year}`;
+        setFormData((prevData) => ({
+            ...prevData,
+            dateOfIssuance: formattedDate
+        }));
+    }
 
     const steps = ["Get Started", "Certificate Data", "User Data", "Publish"];
 
@@ -179,7 +202,10 @@ export default function Generate() {
                             <button className="cta" onClick={handleBack}>
                                 Back
                             </button>
-                            <button className="cta" onClick={handleNext}>
+                            <button className="cta" onClick={(e)=>{
+                                setDate();
+                                handleNext(e);
+                            }}>
                                 Next
                             </button>
                         </div>
@@ -196,7 +222,7 @@ export default function Generate() {
                                         Certificate Published Successfully!
                                     </h2>
                                     <div className="button-wrapper">
-                                        <button className="cta" onClick={()=>window.location.href='/generate'}>
+                                        <button className="cta" onClick={() => window.location.href = '/generate'}>
                                             Publish More
                                         </button>
                                     </div>

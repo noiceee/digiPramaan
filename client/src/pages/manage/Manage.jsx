@@ -16,59 +16,59 @@ export default function Manage({ user }) {
     const certificates = [
         {
             certificate_id: 1,
-            title: "Huehue",
+            title: "Certificate Name",
             issuedOn: "11-02-2004",
             issuerImg:
-                "https://upload.wikimedia.org/wikipedia/commons/2/24/LEGO_logo.svg",
+                "https://th.bing.com/th/id/OIG1.d1cqjtk0eLaYnG5xM30r?w=1024&h=1024&rs=1&pid=ImgDetMain",
         },
         {
             certificate_id: 2,
-            title: "Huehue",
+            title: "Certificate Name",
             issuedOn: "11-02-2004",
             issuerImg:
-                "https://upload.wikimedia.org/wikipedia/commons/2/24/LEGO_logo.svg",
+                "https://th.bing.com/th/id/OIG1.d1cqjtk0eLaYnG5xM30r?w=1024&h=1024&rs=1&pid=ImgDetMain",
         },
         {
             certificate_id: 3,
-            title: "Huehue",
+            title: "Certificate Name",
             issuedOn: "11-02-2004",
             issuerImg:
-                "https://upload.wikimedia.org/wikipedia/commons/2/24/LEGO_logo.svg",
+                "https://th.bing.com/th/id/OIG1.d1cqjtk0eLaYnG5xM30r?w=1024&h=1024&rs=1&pid=ImgDetMain",
         },
         {
             certificate_id: 4,
-            title: "Huehue",
+            title: "Certificate Name",
             issuedOn: "11-02-2004",
             issuerImg:
-                "https://upload.wikimedia.org/wikipedia/commons/2/24/LEGO_logo.svg",
+                "https://th.bing.com/th/id/OIG1.d1cqjtk0eLaYnG5xM30r?w=1024&h=1024&rs=1&pid=ImgDetMain",
         },
         {
             certificate_id: 5,
-            title: "Huehue",
+            title: "Certificate Name",
             issuedOn: "11-02-2004",
             issuerImg:
-                "https://upload.wikimedia.org/wikipedia/commons/2/24/LEGO_logo.svg",
+                "https://th.bing.com/th/id/OIG1.d1cqjtk0eLaYnG5xM30r?w=1024&h=1024&rs=1&pid=ImgDetMain",
         },
         {
             certificate_id: 6,
-            title: "Huehue",
+            title: "Certificate Name",
             issuedOn: "11-02-2004",
             issuerImg:
-                "https://upload.wikimedia.org/wikipedia/commons/2/24/LEGO_logo.svg",
+                "https://th.bing.com/th/id/OIG1.d1cqjtk0eLaYnG5xM30r?w=1024&h=1024&rs=1&pid=ImgDetMain",
         },
         {
             certificate_id: 7,
-            title: "Huehue",
+            title: "Certificate Name",
             issuedOn: "11-02-2004",
             issuerImg:
-                "https://upload.wikimedia.org/wikipedia/commons/2/24/LEGO_logo.svg",
+                "https://th.bing.com/th/id/OIG1.d1cqjtk0eLaYnG5xM30r?w=1024&h=1024&rs=1&pid=ImgDetMain",
         },
         {
             certificate_id: 8,
-            title: "Huehue",
+            title: "Certificate Name",
             issuedOn: "11-02-2004",
             issuerImg:
-                "https://upload.wikimedia.org/wikipedia/commons/2/24/LEGO_logo.svg",
+                "https://th.bing.com/th/id/OIG1.d1cqjtk0eLaYnG5xM30r?w=1024&h=1024&rs=1&pid=ImgDetMain",
         },
     ];
     return (

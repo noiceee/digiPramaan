@@ -14,9 +14,11 @@ const s3 = require("./utils/connect_aws");
 const verifyToken = require("./middlewares/verifyToken");
 const uuidv4 = require("uuid").v4;
 const AWS = require("aws-sdk");
+const multer = require('multer');
 
 const app = express();
 const saltRounds = 10;
+const upload = multer();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -26,29 +28,29 @@ app.use(cors());
 blockchain.connectWeb3();
 
 // Upload Image to AWS bucket
-app.post("/uploadImage", async (req, res) => {
-  const { file } = req.body;
-  const key = uuidv4() + ".jpeg";
-
+app.post("/uploadImage", upload.single('image'), async (req, res) => {
+  // console.log(req.body);
+  const image = req.file.buffer;
+  const key = "fed.jpg";
   const params = {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Key: key,
-    Body: file,
-    ContentType: "image/jpeg",
-    ACL: "public-read",
+    Body: image,
+    // ACL: "public-read",
   };
+  console.log(params);
 
   try {
     const data = await s3.upload(params).promise();
 
-    const urlParams = s3.getSignedUrl("getObject", {
+    const urlParams = {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: key,
-    });
+    };
 
     const signedURL = s3.getSignedUrl("getObject", urlParams);
 
-    res.send({ success: true, url: signedUrl });
+    res.send({ success: true, url: signedURL });
   } catch (err) {
     console.log(err);
     res.status(500).json({ success: false, message: "Failed to upload image" });

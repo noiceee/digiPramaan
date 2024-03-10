@@ -6,6 +6,13 @@ const companySchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+<<<<<<< HEAD
+=======
+  // isIndividual: {
+  //   type: Boolean,
+  //   required: true,
+  // },
+>>>>>>> 033b1a68d5c0b923654a6177ef781100c279ec29
   orgName: {
     type: String,
     required: true,
