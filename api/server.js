@@ -36,7 +36,6 @@ app.post("/uploadImage", upload.single('image'), async (req, res) => {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Key: key,
     Body: image,
-    ContentType: 'image/jpeg',
     // ACL: "public-read",
   };
   console.log(params);
@@ -44,14 +43,14 @@ app.post("/uploadImage", upload.single('image'), async (req, res) => {
   try {
     const data = await s3.upload(params).promise();
 
-    const urlParams = s3.getSignedUrl("getObject", {
+    const urlParams = {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: key,
-    });
+    };
 
     const signedURL = s3.getSignedUrl("getObject", urlParams);
 
-    res.send({ success: true, url: signedUrl });
+    res.send({ success: true, url: signedURL });
   } catch (err) {
     console.log(err);
     res.status(500).json({ success: false, message: "Failed to upload image" });
@@ -97,7 +96,6 @@ app.post("/orgLogin", (req, res) => {
   Companies.findOne({ email })
     .then((obj) => {
       if (!obj) {
-        console.log(err);
         res.status(500).send("Given Company is not registered");
       }
       bcrypt

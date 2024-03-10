@@ -4,6 +4,10 @@ import ProgressBar from '../progressBar/ProgressBar';
 import './signup.scss';
 import { useEffect, useState } from 'react';
 
+
+const validFileTypes = ['image/jpg', 'image/jpeg', 'image/png'];
+
+
 export default function Signup({ isOnSignup, setIsOnSignup }) {
     const [step, setStep] = useState(1);
     const [isIndividual, setIsIndividual] = useState(true);
@@ -112,11 +116,17 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
     };
 
     const handleUpload = async (file) => {
-        const formData = new FormData();
-        formData.append('image', file);
+    
+        if (!validFileTypes.find(type => type === file.type)) {
+        //   setError('File must be in JPG/PNG format');
+          return;
+        }
+
+        const form = new FormData();
+        form.append('image', file);
 
         try {
-            const response = await axios.post('http://localhost:8080/uploadImage', formData, {
+            const response = await axios.post('http://localhost:8080/uploadImage', form, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
