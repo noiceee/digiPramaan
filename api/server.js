@@ -194,6 +194,7 @@ app.post("/login", (req, res) => {
 
 app.post("/generateCertificate", verifyToken, async (req, res) => {
   const {
+    template,
     eventName,
     dateOfIssuance,
     issuerName,
@@ -218,6 +219,7 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
 
   // create certificate buffer
   const certificateBuffer = await genCertificate({
+    template,
     eventName,
     dateOfIssuance,
     issuerName,

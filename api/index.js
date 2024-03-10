@@ -1,9 +1,23 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 
+function getTemplate(template) {
+  switch (template) {
+    case "PARTICIPATION":
+        return("./templates/participate/participate.html");
+    case "WINNER":
+      return("./templates/participate/winner.html");
+    case "RUNNERUP":
+      return("./templates/participate/runnerUp.html");
+    default:
+      break;
+  }
+}
+
 async function genCertificate(jsonData) {
+
   const htmlTemplate = fs.readFileSync(
-    "./templates/participate/participate.html",
+    getTemplate(jsonData.template),
     "utf-8"
   );
   const htmlContent = htmlTemplate

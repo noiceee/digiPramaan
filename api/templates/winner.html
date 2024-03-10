@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Certificate of Participation</title>
+  <title>Certificate of Achievement</title>
+  <link rel="stylesheet" href="style.css">
   <style>
     * {
       box-sizing: border-box;
@@ -19,12 +20,10 @@
     }
 
     .certificate {
-      background-color: rgb(240, 197, 145);
+      background-color: rgb(255, 203, 139);
       padding: 100px;
       text-align: center;
       position: relative;
-      background-position: center;
-      background-size: cover;
     }
 
     .certificate>img {
@@ -58,13 +57,13 @@
 </head>
 
 <body>
-  <div class="certificate" style='background-image: url({{backgroundImage}});'>
-    <img class="issuer-logo" src="https://dpu.edu.in/img/logo.png"></img>
+  <div class="certificate">
+    <img class="issuer-logo" src='{{imgSrc}}'></img>
     <img class="digi-logo" src="../logo.png"></img>
     <div class="content-wrapper">
       <h1 class="title">Certificate of Participation</h1>
       <p class="content">
-        This is to certify that <strong><u>{{recieverName}}</u></strong> has successfully participated in the event:
+        This is to certify that <strong><u>{{recieverName}}</u></strong> has secured 1st rank in the event:
         <em>{{eventName}}</em>
         <br>
         Organized by {{organizationName}}
