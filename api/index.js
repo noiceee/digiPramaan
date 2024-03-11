@@ -4,39 +4,48 @@ const fs = require("fs");
 function getTemplate(template) {
   switch (template) {
     case "PARTICIPATION":
-      return "./templates/participate/participate.html";
+      return "./templates/participate.html";
     case "WINNER":
-      return "./templates/participate/winner.html";
+      return "./templates/winner.html";
     case "RUNNERUP":
-      return "./templates/participate/runnerUp.html";
+      return "./templates/runnerUp.html";
     default:
       break;
   }
 }
 
 async function genCertificate(jsonData) {
-  const htmlTemplate = fs.readFileSync(getTemplate(jsonData.template), "utf-8");
-  const htmlContent = htmlTemplate
-    .replace("{{orgLogo}}", jsonData.orgLogo)
-    .replace("{{eventName}}", jsonData.eventName)
-    .replace("{{dateOfIssuance}}", jsonData.dateOfIssuance)
-    .replaceAll("{{recieverName}}", jsonData.recieverName)
-    .replace("{{recipientID}}", jsonData.recipientID)
-    .replace("{{organizationID}}", jsonData.organizationID)
-    .replace("{{organizationName}}", jsonData.organizationName);
+  try {
+    const htmlTemplate = fs.readFileSync(
+      getTemplate(jsonData.template),
+      "utf-8"
+    );
+    const htmlContent = htmlTemplate
+      .replace("{{orgLogo}}", jsonData.orgLogo)
+      .replace("{{eventName}}", jsonData.eventName)
+      .replace("{{dateOfIssuance}}", jsonData.dateOfIssuance)
+      .replaceAll("{{recieverName}}", jsonData.recieverName)
+      .replace("{{certificateId}}", jsonData.certificateId)
+      .replace("{{organizationId}}", jsonData.organizationId)
+      .replace("{{organizationName}}", jsonData.organizationName);
 
-  const browser = await puppeteer.launch({
-    headless: "new",
-  });
+    const browser = await puppeteer.launch({
+      headless: "new",
+    });
 
-  const page = await browser.newPage();
+    const page = await browser.newPage();
 
-  await page.setContent(htmlContent, { waitUntil: "load" });
+    await page.setContent(htmlContent, { waitUntil: "load" });
 
-  const pdfBuffer = await page.pdf({ height: 542, printBackground: true });
+    const pdfBuffer = await page.pdf({ height: 561, printBackground: true });
 
-  await browser.close();
-  return pdfBuffer;
+    await browser.close();
+
+    return pdfBuffer;
+  } catch (error) {
+    console.error("Error generating certificate:", error);
+    throw error;
+  }
 }
 
 module.exports = genCertificate;
