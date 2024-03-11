@@ -11,7 +11,7 @@ const addCertificates = async (certDetails) => {
   } = certDetails;
 
   try {
-    const certDetails = new Certificates({
+    const certInstance = new Certificates({
       recieverEmail,
       eventName,
       orgLogo,
@@ -20,18 +20,16 @@ const addCertificates = async (certDetails) => {
       certificateId,
     });
 
-    return certDetails
-      .save()
-      .then((obj) => {
-        console.log("Certificate details uploaded successfully!");
-        console.log(obj);
-      })
-      .catch((err) => {
-        throw err;
-      });
+    const savedCert = await certInstance.save();
+    console.log("[SUCCESS] Certificate details uploaded successfully!");
+    console.log(savedCert);
+    return savedCert;
   } catch (err) {
-    console.log("[ERROR] Uploading certificate details was unsuccessful");
-    throw err;
+    console.error(
+      "[ERROR] Uploading certificate details was unsuccessful:",
+      err
+    );
+    throw err; // Propagate the error to the calling function
   }
 };
 

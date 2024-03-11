@@ -13,10 +13,11 @@ const crypto = require("crypto");
 const s3 = require("./utils/connect_aws");
 const verifyToken = require("./middlewares/verifyToken");
 const uuidv4 = require("uuid").v4;
-const AWS = require("aws-sdk");
+const awsSdk = require("aws-sdk");
 const multer = require("multer");
 const addCertificates = require("./middlewares/appendCertDetails");
 const { error } = require("console");
+const mongoose = require("mongoose");
 const Certificates = require("./models/certificates");
 
 const app = express();
@@ -28,23 +29,37 @@ app.use(bodyParser.json());
 
 app.use(cors());
 // Making connection with blockchain network
-blockchain.connectWeb3();
+try {
+  blockchain.connectWeb3();
+} catch (error) {
+  console.error("[ERROR] An error occurred while connecting to web3");
+  res.status(500).send({ err: error.message });
+}
+
+// Error Handling Middleware
+app.use(function (err, req, res, next) {
+  console.error("[ERROR] An error occurred:", err.message);
+  res.status(500).send("An error occurred on the server");
+});
 
 // Upload Image to AWS bucket
 app.post("/uploadImage", upload.single("image"), async (req, res) => {
-  // console.log(req.body);
   const image = req.file.buffer;
-  const key = "fed.jpg";
+
+  // Generate a unique key for the uploaded file
+  const key = "assets/" + uuidv4() + ".jpg"; // Example: "6c84fb90-12c4-11e1-840d-7b25c5ee775a.jpg"
+
   const params = {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Key: key,
     Body: image,
   };
-  console.log(params);
 
   try {
+    // Upload the image to AWS S3
     await s3.upload(params).promise();
 
+    // Generate a signed URL for the uploaded image
     const urlParams = {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: key,
@@ -53,33 +68,29 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
 
     const signedURL = s3.getSignedUrl("getObject", urlParams);
 
-    res.send({ success: true, url: signedURL });
+    res.status(200).json({ success: true, url: signedURL });
   } catch (err) {
-    console.log(err);
+    console.error("Error uploading image:", err);
     res.status(500).json({ success: false, message: "Failed to upload image" });
   }
 });
 
 // LOGIN AND SIGNUP FACILITY FOR COMPANIES/ORGANISATIONS
 app.post("/orgRegistration", (req, res) => {
-  const { email, isIndividual, orgName, orgLogo, orgSignature, password } =
-    req.body;
+  const { email, orgName, orgLogo, orgSignature, password } = req.body;
 
-  let hashedPassword;
-
-  bcrypt.hash(password, saltRounds, (err, hash) => {
+  bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
     if (err) {
-      console.log(err);
-      res.status(500).send(err);
+      console.error("Error hashing password:", err);
+      return res.status(500).send("Internal Server Error");
     }
 
     const orgUser = new Companies({
       email,
-      isIndividual,
       orgName,
       orgLogo,
       orgSignature,
-      password: hash,
+      password: hashedPassword,
     });
 
     orgUser
@@ -89,8 +100,8 @@ app.post("/orgRegistration", (req, res) => {
         res.status(200).send(obj);
       })
       .catch((err) => {
-        console.log(err);
-        res.status(400).send(err);
+        console.error("Error saving organisation:", err);
+        res.status(400).send("Bad Request");
       });
   });
 });
@@ -101,36 +112,37 @@ app.post("/orgLogin", (req, res) => {
   Companies.findOne({ email })
     .then((obj) => {
       if (!obj) {
-        res.status(500).send("Given Company is not registered");
+        return res.status(404).send("Company not found");
       }
+
       bcrypt
         .compare(password, obj.password)
         .then((match) => {
           if (!match) {
-            res.status(500).send("Incorrect Password");
+            return res.status(401).send("Incorrect password");
           }
 
           const expirationTime = new Date().getTime() + 1 * 60 * 60 * 1000;
-          const Token = jwt.sign(
+          const token = jwt.sign(
             { userId: obj._id, exp: expirationTime },
             process.env.JWT_KEY
           );
 
-          const resObj = {
+          const responseObj = {
             data: obj,
-            token: Token,
+            token: token,
           };
 
-          res.status(200).send(resObj);
+          res.status(200).send(responseObj);
         })
         .catch((err) => {
-          console.log(err);
-          res.status(500).send(err);
+          console.error("Error comparing passwords:", err);
+          res.status(500).send("Internal Server Error");
         });
     })
     .catch((err) => {
-      console.log(err);
-      res.status(500).send(err);
+      console.error("Error finding company:", err);
+      res.status(500).send("Internal Server Error");
     });
 });
 
@@ -138,24 +150,22 @@ app.post("/orgLogin", (req, res) => {
 app.post("/register", (req, res) => {
   const { email, name, password } = req.body;
 
-  let hashedPassword;
-
-  bcrypt.hash(password, saltRounds, (err, hash) => {
+  bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
     if (err) {
-      console.log(err);
-      res.status(500).send(err);
+      console.error("Error hashing password:", err);
+      return res.status(500).send("Internal Server Error");
     }
 
-    const user = new Users({ email, name, password: hash });
+    const user = new Users({ email, name, password: hashedPassword });
     user
       .save()
       .then((obj) => {
-        console.log("User Successfully Registered : ");
+        console.log("User Successfully Registered:", obj);
         res.status(200).send(obj);
       })
       .catch((err) => {
-        console.log(err);
-        res.status(400).send(err);
+        console.error("Error saving user:", err);
+        res.status(400).send("Bad Request");
       });
   });
 });
@@ -164,38 +174,39 @@ app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
   Users.findOne({ email })
-    .then((resObj) => {
-      if (!resObj) {
-        res.status(500).send("User not Found");
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send("User not found");
       }
+
       bcrypt
-        .compare(password, resObj.password)
+        .compare(password, user.password)
         .then((match) => {
           if (!match) {
-            res.status(500).send("Incorrect password");
+            return res.status(401).send("Incorrect password");
           }
 
           const expirationTime = new Date().getTime() + 1 * 60 * 60 * 1000;
           const token = jwt.sign(
-            { userId: resObj._id, exp: expirationTime },
+            { userId: user._id, exp: expirationTime },
             process.env.JWT_KEY
           );
 
           const responseObject = {
-            data: resObj,
+            data: user,
             token: token,
           };
 
           res.status(200).send(responseObject);
         })
         .catch((err) => {
-          console.log(err);
-          res.status(500).send(err);
+          console.error("Error comparing passwords:", err);
+          res.status(500).send("Internal Server Error");
         });
     })
     .catch((err) => {
-      console.log(err);
-      res.status(500).send(err);
+      console.error("Error finding user:", err);
+      res.status(500).send("Internal Server Error");
     });
 });
 
@@ -204,86 +215,68 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
 
   const token = req.headers["authorization"];
 
-  // fetching issuer data from the database
-  let issuerData;
   try {
+    // Fetching issuer data from the database
     const decoded = jwt.verify(token, process.env.JWT_KEY);
     const userId = decoded.userId;
 
     if (!userId) {
       throw new Error("User ID is undefined or null");
     }
-    issuerData = await Companies.findOne({ _id: userId })
-      .then((obj) => {
-        if (obj) {
-          return obj;
-        } else {
-          throw new Error("appending details unsuccessful");
-        }
-      })
-      .catch((err) => {
-        throw err;
-      });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Not a registered Organization user!");
-    return;
-  }
 
-  // Creating the required variable for creation of certificates
-  const dateOfIssuance = new Date().toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-  const organizationName = issuerData.orgName;
-  const organizationId = String(issuerData._id);
-  const certificateId = uuidv4();
-  const orgLogo = issuerData.orgLogo;
-  const orgSignature = issuerData.orgSignature;
-
-  // create certificate buffer
-  const certificateBuffer = await genCertificate({
-    template,
-    orgLogo,
-    eventName,
-    dateOfIssuance,
-    recieverName,
-    certificateId,
-    organizationId,
-    organizationName,
-  });
-
-  const folderName = recieverEmail;
-  const certificateFileName = certificateId + ".pdf";
-  const key = `${folderName}/${certificateFileName}`;
-  const uploadParams = {
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Key: key,
-    Body: certificateBuffer,
-    ContentType: "application/pdf",
-  };
-
-  try {
-    const uploadCert = await s3.upload(uploadParams).promise();
-
-    if (!uploadCert || !uploadCert.Location) {
-      throw new Error();
+    const issuerData = await Companies.findOne({ _id: userId });
+    if (!issuerData) {
+      throw new Error("Issuer data not found");
     }
-  } catch (err) {
-    console.log("Failed to upload certificate to AWS S3");
-    res.status(500).send(err);
-  }
-  const urlParams = {
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Key: key,
-    Expires: 0,
-  };
 
-  const certLink = s3.getSignedUrl("getObject", urlParams);
-  console.log("Certificate uploaded to S3:", certLink);
+    // Creating required variables for certificate creation
+    const dateOfIssuance = new Date().toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+    const { orgName, orgLogo, orgSignature } = issuerData;
+    const organizationId = String(issuerData._id);
+    const certificateId = uuidv4();
 
-  try {
+    // Generate certificate buffer
+    const certificateBuffer = await genCertificate({
+      template,
+      orgLogo,
+      eventName,
+      dateOfIssuance,
+      recieverName,
+      certificateId,
+      organizationId,
+      organizationName: orgName,
+    });
+
+    // Upload certificate to AWS S3
+    const folderName = recieverEmail;
+    const certificateFileName = certificateId + ".pdf";
+    const key = `${folderName}/${certificateFileName}`;
+    const uploadParams = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: key,
+      Body: certificateBuffer,
+      ContentType: "application/pdf",
+    };
+
+    const uploadCert = await s3.upload(uploadParams).promise();
+    if (!uploadCert || !uploadCert.Location) {
+      throw new Error("Failed to upload certificate to AWS S3");
+    }
+
+    // Generate signed URL for the uploaded certificate
+    const urlParams = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: key,
+      Expires: 0,
+    };
+    const certLink = s3.getSignedUrl("getObject", urlParams);
+    console.log("Certificate uploaded to S3:", certLink);
+
+    // Add certificate details to the database
     await addCertificates({
       recieverEmail,
       eventName,
@@ -292,58 +285,62 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
       dateOfIssuance,
       certificateId,
     });
-  } catch (err) {
-    res.status(500).send(err);
-    throw err;
-  }
 
-  const hash = crypto
-    .createHash("sha256")
-    .update(certificateBuffer)
-    .digest("hex");
+    // Create hash of the certificate buffer
+    const hash = crypto
+      .createHash("sha256")
+      .update(certificateBuffer)
+      .digest("hex");
+    console.log("Certificate created successfully with hash:", hash);
 
-  console.log("Certificate Created successfully with hash : " + hash);
-
-  // Storing data on blockchain network
-  blockchain
-    .generateCertificate(
+    // Store data on the blockchain network
+    const blockchainResponse = await blockchain.generateCertificate(
       eventName,
       dateOfIssuance,
       recieverName,
       certificateId,
       organizationId,
-      organizationName,
+      orgName,
       hash
-    )
-    .then((obj) => {
-      const { transactionHash, blockHash } = obj.receipt;
-      console.log(transactionHash);
-      console.log(blockHash);
-      res.status(201).send({
-        receipt: {
-          transactionHash,
-          blockHash,
-        },
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send(err);
+    );
+
+    const { transactionHash, blockHash } = blockchainResponse.receipt;
+    console.log("Transaction Hash:", transactionHash);
+    console.log("Block Hash:", blockHash);
+
+    // Send response with transaction and block hashes
+    res.status(201).send({
+      receipt: {
+        transactionHash,
+        blockHash,
+      },
     });
+  } catch (err) {
+    console.error("An error occurred:", err);
+    res.status(500).send({ msg: "Internal Server Error", error: err.message });
+  }
 });
 
 // Error handeling done
 app.get("/verifyCertificate/:hash", async (req, res) => {
-  const _hash = req.params.hash; // Access the hash from params
+  const _hash = req.params.hash;
 
   try {
-    const obj = await blockchain.verifyCertificate(_hash);
-    console.log(obj);
-    res.status(200).send(obj);
+    const data = await blockchain.verifyCertificate(_hash);
+
+    const formattedData = {
+      eventName: data[0],
+      dateOfIssuance: data[1],
+      recieverName: data[2],
+      certificateId: data[3],
+      organizationId: data[4],
+      organizationName: data[5],
+    };
+
+    res.status(200).json(formattedData);
   } catch (err) {
-    console.log(err);
-    res.status(400).send({
-      err: `No data found for the given certificate hash : ${_hash}`,
+    res.status(400).json({
+      error: `No data found for the given certificate hash : ${_hash}`,
     });
   }
 });
@@ -351,8 +348,8 @@ app.get("/verifyCertificate/:hash", async (req, res) => {
 app.get("/getCertificates/:certOwnerEmail", verifyToken, async (req, res) => {
   const { certOwnerEmail } = req.params;
 
-  // User validation by checking through token
   try {
+    // User validation by checking through token
     const token = req.headers["authorization"];
     const decoded = jwt.verify(token, process.env.JWT_KEY);
     const userId = decoded.userId;
@@ -360,43 +357,29 @@ app.get("/getCertificates/:certOwnerEmail", verifyToken, async (req, res) => {
     if (!userId) {
       throw new Error("User ID is undefined or null");
     }
-    await Users.findOne({ _id: userId })
-      .then((obj) => {
-        if (obj.email !== certOwnerEmail) {
-          throw new Error(
-            "[ERROR] You cannot access certificates of different users!"
-          );
-        } else if (!obj) {
-          throw new Error("[ERROR] Invalid User!");
-        }
-      })
-      .catch((err) => {
-        throw err;
-      });
-  } catch (err) {
-    console.log(
-      `[ERROR] You don't have required rights to access certificates for ${certOwnerEmail}`
-    );
-    res.status(500).send(err.message);
-    return;
-  }
-  // fetching all certificates issued to a user and creating an array of objects
-  try {
+
+    const user = await Users.findOne({ _id: userId });
+
+    if (!user) {
+      throw new Error("[ERROR] Invalid User!");
+    }
+
+    if (user.email !== certOwnerEmail) {
+      throw new Error(
+        "[ERROR] You cannot access certificates of different users!"
+      );
+    }
+
+    // Fetching all certificates issued to a user
     const certDetails = await Certificates.find({
       recieverEmail: certOwnerEmail,
-    })
-      .then((obj) => {
-        console.log(obj);
-        return obj;
-      })
-      .catch((err) => {
-        throw err;
-      });
+    });
 
-    res.status(200).send(certDetails);
-  } catch (error) {
-    console.error("Error retrieving certificates:", error);
-    res.status(500).send("Error retrieving certificates");
+    console.log("[SUCCESS] Certificates retrieved successfully");
+    res.status(200).json(certDetails);
+  } catch (err) {
+    console.error("Error retrieving certificates:", err);
+    res.status(500).send(err.message);
   }
 });
 
