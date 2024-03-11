@@ -4,6 +4,7 @@ import axios from "axios";
 export default function Verify() {
   const [hashAsInput, setInput] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState("VERIFY");
+  const [certificateData, setCertificateData] = useState();
   const inputRef = useRef(null);
   const headingRef = useRef(null);
   let isCertificateValid = true;
@@ -23,7 +24,10 @@ export default function Verify() {
     const verify = async () => {
       try {
           const response = await axios.get(`http://localhost:8080/verifyCertificate/${inputRef.current.value}`);
-          if(response)setVerificationStatus("VALID");
+          if(response){
+            setVerificationStatus("VALID");
+            setCertificateData(response.data);
+          };
       } catch (error) {
         setVerificationStatus("INVALID");
           console.error('Error fetching data:', error);
@@ -80,10 +84,12 @@ export default function Verify() {
             <img className="result-img" src="images/valid.gif" alt="" />
           </div>
           <div className="document-info">
-            <span>Certificate ID : {'NA'}</span>
-            <span>Issuer ID : {'NA'}</span>
-            <span>Date of Issuance : {'NA'}</span>
-            <span>CValid Till : {'NA'}</span>
+            <span>Event Name : {certificateData[0]}</span>
+            <span>Reciever Name : {certificateData[2]}</span>
+            <span>Issuer Name : {certificateData[5]}</span>
+            <span>Date of Issuance : {certificateData[1]}</span>
+            <span>Certificate ID : {certificateData[3]}</span>
+            <span>Organization ID : {certificateData[4]}</span>
           </div>
           <div className="button-wrapper">
             <button className="cta">Download</button>
