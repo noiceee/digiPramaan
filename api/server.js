@@ -326,6 +326,8 @@ app.get("/verifyCertificate/:hash", async (req, res) => {
 app.get("/getCertificates/:userEmail", verifyToken, async (req, res) => {
   const { userEmail } = req.params;
 
+  // User validation by checking through token
+
   const params = {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Prefix: `${userEmail}/`,
