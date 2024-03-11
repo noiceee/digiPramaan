@@ -1,6 +1,11 @@
 const { mongoose } = require("./mongoose");
 
 const certificatesSchema = new mongoose.Schema({
+  recieverEmail: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   eventName: {
     type: String,
     required: true,

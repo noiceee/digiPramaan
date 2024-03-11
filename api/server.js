@@ -17,6 +17,7 @@ const AWS = require("aws-sdk");
 const multer = require("multer");
 const addCertificates = require("./middlewares/appendCertDetails");
 const { error } = require("console");
+const Certificates = require("./models/certificates");
 
 const app = express();
 const saltRounds = 10;
@@ -217,16 +218,16 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
         if (obj) {
           return obj;
         } else {
-          throw err;
+          throw new Error("appending details unsuccessful");
         }
       })
       .catch((err) => {
-        console.log(err);
         throw err;
       });
   } catch (err) {
     console.log(err);
     res.status(500).send("Not a registered Organization user!");
+    return;
   }
 
   // Creating the required variable for creation of certificates
@@ -284,6 +285,7 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
 
   try {
     await addCertificates({
+      recieverEmail,
       eventName,
       orgLogo,
       certLink,
@@ -346,33 +348,52 @@ app.get("/verifyCertificate/:hash", async (req, res) => {
   }
 });
 
-app.get("/getCertificates/:recieverEmail", verifyToken, async (req, res) => {
-  const { recieverEmail } = req.params;
+app.get("/getCertificates/:certOwnerEmail", verifyToken, async (req, res) => {
+  const { certOwnerEmail } = req.params;
 
   // User validation by checking through token
-
-  const params = {
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Prefix: `${recieverEmail}/`,
-  };
-
   try {
-    const data = await s3.listObjectsV2(params).promise();
+    const token = req.headers["authorization"];
+    const decoded = jwt.verify(token, process.env.JWT_KEY);
+    const userId = decoded.userId;
 
-    const certificateKeys = data.Contents.map((obj) => obj.Key);
-    const preSignedUrls = certificateKeys.map((key) => {
-      const urlParams = {
-        Bucket: process.env.AWS_S3_BUCKET_NAME,
-        Key: key,
-        Expires: 0,
-      };
+    if (!userId) {
+      throw new Error("User ID is undefined or null");
+    }
+    await Users.findOne({ _id: userId })
+      .then((obj) => {
+        if (obj.email !== certOwnerEmail) {
+          throw new Error(
+            "[ERROR] You cannot access certificates of different users!"
+          );
+        } else if (!obj) {
+          throw new Error("[ERROR] Invalid User!");
+        }
+      })
+      .catch((err) => {
+        throw err;
+      });
+  } catch (err) {
+    console.log(
+      `[ERROR] You don't have required rights to access certificates for ${certOwnerEmail}`
+    );
+    res.status(500).send(err.message);
+    return;
+  }
+  // fetching all certificates issued to a user and creating an array of objects
+  try {
+    const certDetails = await Certificates.find({
+      recieverEmail: certOwnerEmail,
+    })
+      .then((obj) => {
+        console.log(obj);
+        return obj;
+      })
+      .catch((err) => {
+        throw err;
+      });
 
-      const url = s3.getSignedUrl("getObject", urlParams);
-      return url;
-    });
-
-    console.log("Url links are : ", preSignedUrls);
-    res.status(200).send(preSignedUrls);
+    res.status(200).send(certDetails);
   } catch (error) {
     console.error("Error retrieving certificates:", error);
     res.status(500).send("Error retrieving certificates");
