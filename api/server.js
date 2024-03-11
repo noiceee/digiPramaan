@@ -313,7 +313,7 @@ app.get("/verifyCertificate/:hash", async (req, res) => {
 
   try {
     const obj = await blockchain.verifyCertificate(_hash);
-    console.log("Here");
+    console.log(obj);
     res.status(200).send(obj);
   } catch (err) {
     console.log(err);

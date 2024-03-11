@@ -33,7 +33,7 @@ async function genCertificate(jsonData) {
 
   await page.setContent(htmlContent, { waitUntil: "load" });
 
-  const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
+  const pdfBuffer = await page.pdf({ height: 542, printBackground: true });
 
   await browser.close();
   return pdfBuffer;
