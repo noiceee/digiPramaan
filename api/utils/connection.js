@@ -62,8 +62,6 @@ const verifyCertificate = function (_hash) {
 const generateCertificate = function (
   eventName,
   dateOfIssuance,
-  issuerName,
-  issuerID,
   recieverName,
   recipientID,
   organizationID,
@@ -84,8 +82,6 @@ const generateCertificate = function (
         return instance.appendCertificate.estimateGas(
           eventName,
           dateOfIssuance,
-          issuerName,
-          issuerID,
           recieverName,
           recipientID,
           organizationID,
@@ -106,8 +102,6 @@ const generateCertificate = function (
           return instance.appendCertificate(
             eventName,
             dateOfIssuance,
-            issuerName,
-            issuerID,
             recieverName,
             recipientID,
             organizationID,

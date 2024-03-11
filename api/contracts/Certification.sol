@@ -6,11 +6,9 @@ contract Certifications {
     struct certDetails {
         string eventName;
         string dateOfIssuance;
-        string issuerName;
-        int256 issuerID;
         string recieverName;
-        int256 recipientID;
-        int256 organizationID;
+        string recipientID;
+        string organizationID;
         string organizationName;
     }
 
@@ -19,11 +17,9 @@ contract Certifications {
     function appendCertificate(
         string memory _eventName,
         string memory _dateOfIssuance,
-        string memory _issuerName,
-        int256 _issuerID,
         string memory _recieverName,
-        int256 _recipientID,
-        int256 _organizationID,
+        string memory _recipientID,
+        string memory _organizationID,
         string memory _organizationName,
         string memory _hash
     ) public{
@@ -31,8 +27,6 @@ contract Certifications {
         hashes[_hash] = certDetails(
             _eventName,
             _dateOfIssuance,
-            _issuerName,
-            _issuerID,
             _recieverName,
             _recipientID,
             _organizationID,

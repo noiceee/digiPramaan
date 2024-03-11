@@ -234,15 +234,14 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     year: "numeric",
   });
   const organizationName = issuerData.orgName;
-  const organizationID = issuerData._id;
+  const organizationID = String(issuerData._id);
   const recipientID = uuidv4();
-
-  console.log(issuerData);
-
-  /*
+  const orgLogo = issuerData.orgLogo;
+  const orgSignature = issuerData.orgSignature;
 
   // create certificate buffer
   const certificateBuffer = await genCertificate({
+    orgLogo,
     eventName,
     dateOfIssuance,
     recieverName,
@@ -278,13 +277,13 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
 
   console.log("Certificate Created successfully with hash : " + hash);
 
+  console.log(typeof recipientID);
+
   // Storing data on blockchain network
   blockchain
     .generateCertificate(
       eventName,
       dateOfIssuance,
-      issuerName,
-      issuerID,
       recieverName,
       recipientID,
       organizationID,
@@ -306,7 +305,6 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
       console.log(err);
       res.status(500).send(err);
     });
-    */
 });
 
 // Error handeling done

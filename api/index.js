@@ -7,6 +7,7 @@ async function genCertificate(jsonData) {
     "utf-8"
   );
   const htmlContent = htmlTemplate
+    .replace("{{orgLogo}}", jsonData.orgLogo)
     .replace("{{eventName}}", jsonData.eventName)
     .replace("{{dateOfIssuance}}", jsonData.dateOfIssuance)
     .replaceAll("{{recieverName}}", jsonData.recieverName)
