@@ -54,18 +54,14 @@ const verifyCertificate = function (_hash) {
       return instance.verifyCertification.call(_hash);
     })
     .catch((err) => {
-      console.log(err);
-      Promise.reject(
-        "No certificate found with the given hash value : " + _hash
-      );
+      // console.log(err);
+      throw err;
     });
 };
 
 const generateCertificate = function (
   eventName,
   dateOfIssuance,
-  issuerName,
-  issuerID,
   recieverName,
   recipientID,
   organizationID,
@@ -86,8 +82,6 @@ const generateCertificate = function (
         return instance.appendCertificate.estimateGas(
           eventName,
           dateOfIssuance,
-          issuerName,
-          issuerID,
           recieverName,
           recipientID,
           organizationID,
@@ -108,8 +102,6 @@ const generateCertificate = function (
           return instance.appendCertificate(
             eventName,
             dateOfIssuance,
-            issuerName,
-            issuerID,
             recieverName,
             recipientID,
             organizationID,

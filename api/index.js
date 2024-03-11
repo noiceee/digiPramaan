@@ -4,27 +4,22 @@ const fs = require("fs");
 function getTemplate(template) {
   switch (template) {
     case "PARTICIPATION":
-        return("./templates/participate/participate.html");
+      return "./templates/participate/participate.html";
     case "WINNER":
-      return("./templates/participate/winner.html");
+      return "./templates/participate/winner.html";
     case "RUNNERUP":
-      return("./templates/participate/runnerUp.html");
+      return "./templates/participate/runnerUp.html";
     default:
       break;
   }
 }
 
 async function genCertificate(jsonData) {
-
-  const htmlTemplate = fs.readFileSync(
-    getTemplate(jsonData.template),
-    "utf-8"
-  );
+  const htmlTemplate = fs.readFileSync(getTemplate(jsonData.template), "utf-8");
   const htmlContent = htmlTemplate
+    .replace("{{orgLogo}}", jsonData.orgLogo)
     .replace("{{eventName}}", jsonData.eventName)
     .replace("{{dateOfIssuance}}", jsonData.dateOfIssuance)
-    .replace("{{issuerName}}", jsonData.issuerName)
-    .replace("{{issuerID}}", jsonData.issuerID)
     .replaceAll("{{recieverName}}", jsonData.recieverName)
     .replace("{{recipientID}}", jsonData.recipientID)
     .replace("{{organizationID}}", jsonData.organizationID)

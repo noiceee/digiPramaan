@@ -16,8 +16,6 @@ const verifyToken = function (req, res, next) {
         message: "Failed to authenticate!!",
       });
     }
-
-    req.userId = decoded.id;
     next();
   });
 };
