@@ -15,6 +15,8 @@ const verifyToken = require("./middlewares/verifyToken");
 const uuidv4 = require("uuid").v4;
 const AWS = require("aws-sdk");
 const multer = require("multer");
+const addCertificates = require("./middlewares/appendCertDetails");
+const { error } = require("console");
 
 const app = express();
 const saltRounds = 10;
@@ -36,16 +38,16 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Key: key,
     Body: image,
-    // ACL: "public-read",
   };
   console.log(params);
 
   try {
-    const data = await s3.upload(params).promise();
+    await s3.upload(params).promise();
 
     const urlParams = {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: key,
+      Expires: 0,
     };
 
     const signedURL = s3.getSignedUrl("getObject", urlParams);
@@ -197,7 +199,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/generateCertificate", verifyToken, async (req, res) => {
-  const { eventName, recieverName, userEmail, template } = req.body;
+  const { eventName, recieverName, recieverEmail, template } = req.body;
 
   const token = req.headers["authorization"];
 
@@ -234,8 +236,8 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     year: "numeric",
   });
   const organizationName = issuerData.orgName;
-  const organizationID = String(issuerData._id);
-  const recipientID = uuidv4();
+  const organizationId = String(issuerData._id);
+  const certificateId = uuidv4();
   const orgLogo = issuerData.orgLogo;
   const orgSignature = issuerData.orgSignature;
 
@@ -246,13 +248,13 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     eventName,
     dateOfIssuance,
     recieverName,
-    recipientID,
-    organizationID,
+    certificateId,
+    organizationId,
     organizationName,
   });
 
-  const folderName = userEmail;
-  const certificateFileName = uuidv4() + eventName + ".pdf";
+  const folderName = recieverEmail;
+  const certificateFileName = certificateId + ".pdf";
   const key = `${folderName}/${certificateFileName}`;
   const uploadParams = {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
@@ -261,14 +263,37 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     ContentType: "application/pdf",
   };
 
-  const uploadResult = await s3.upload(uploadParams).promise();
+  try {
+    const uploadCert = await s3.upload(uploadParams).promise();
 
-  // Check if the upload was successful
-  if (!uploadResult || !uploadResult.Location) {
-    throw new Error("Failed to upload certificate to AWS S3");
+    if (!uploadCert || !uploadCert.Location) {
+      throw new Error();
+    }
+  } catch (err) {
+    console.log("Failed to upload certificate to AWS S3");
+    res.status(500).send(err);
   }
+  const urlParams = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: key,
+    Expires: 0,
+  };
 
-  console.log("Certificate uploaded to S3:", uploadResult.Location);
+  const certLink = s3.getSignedUrl("getObject", urlParams);
+  console.log("Certificate uploaded to S3:", certLink);
+
+  try {
+    await addCertificates({
+      eventName,
+      orgLogo,
+      certLink,
+      dateOfIssuance,
+      certificateId,
+    });
+  } catch (err) {
+    res.status(500).send(err);
+    throw err;
+  }
 
   const hash = crypto
     .createHash("sha256")
@@ -277,16 +302,14 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
 
   console.log("Certificate Created successfully with hash : " + hash);
 
-  console.log(typeof recipientID);
-
   // Storing data on blockchain network
   blockchain
     .generateCertificate(
       eventName,
       dateOfIssuance,
       recieverName,
-      recipientID,
-      organizationID,
+      certificateId,
+      organizationId,
       organizationName,
       hash
     )
@@ -323,14 +346,14 @@ app.get("/verifyCertificate/:hash", async (req, res) => {
   }
 });
 
-app.get("/getCertificates/:userEmail", verifyToken, async (req, res) => {
-  const { userEmail } = req.params;
+app.get("/getCertificates/:recieverEmail", verifyToken, async (req, res) => {
+  const { recieverEmail } = req.params;
 
   // User validation by checking through token
 
   const params = {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Prefix: `${userEmail}/`,
+    Prefix: `${recieverEmail}/`,
   };
 
   try {
@@ -341,7 +364,7 @@ app.get("/getCertificates/:userEmail", verifyToken, async (req, res) => {
       const urlParams = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         Key: key,
-        Expires: 36000,
+        Expires: 0,
       };
 
       const url = s3.getSignedUrl("getObject", urlParams);

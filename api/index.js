@@ -4,11 +4,11 @@ const fs = require("fs");
 function getTemplate(template) {
   switch (template) {
     case "PARTICIPATION":
-      return "./templates/participate/participate.html";
+      return "./templates/participate.html";
     case "WINNER":
-      return "./templates/participate/winner.html";
+      return "./templates/winner.html";
     case "RUNNERUP":
-      return "./templates/participate/runnerUp.html";
+      return "./templates/runnerUp.html";
     default:
       break;
   }
@@ -21,8 +21,8 @@ async function genCertificate(jsonData) {
     .replace("{{eventName}}", jsonData.eventName)
     .replace("{{dateOfIssuance}}", jsonData.dateOfIssuance)
     .replaceAll("{{recieverName}}", jsonData.recieverName)
-    .replace("{{recipientID}}", jsonData.recipientID)
-    .replace("{{organizationID}}", jsonData.organizationID)
+    .replace("{{certificateId}}", jsonData.certificateId)
+    .replace("{{organizationId}}", jsonData.organizationId)
     .replace("{{organizationName}}", jsonData.organizationName);
 
   const browser = await puppeteer.launch({
@@ -33,7 +33,7 @@ async function genCertificate(jsonData) {
 
   await page.setContent(htmlContent, { waitUntil: "load" });
 
-  const pdfBuffer = await page.pdf({ height: 542, printBackground: true });
+  const pdfBuffer = await page.pdf({ height: 561, printBackground: true });
 
   await browser.close();
   return pdfBuffer;
