@@ -10,12 +10,11 @@ export default function Generate() {
     const [isWinner, setIsWinner] = useState(true);
     const [formData, setFormData] = useState({
         recieverName: "",
-        recieverEmail: "",
+        userEmail: "",
         eventName: "",
-        isIndividual: "",
-        type: "",
         dateOfIssuance: "",
         backgroundImage: "",
+        template: ""
     });
     const [backgroundImage, setBackgroundImage] = useState(null);
     const [published, setPublished] = useState(false);
@@ -34,11 +33,22 @@ export default function Generate() {
     };
 
     useEffect(() => {
+        let template;
+        if(isIndividual) {
+            if(isWinner){
+                template = 'WINNER';
+            } else {
+                template = 'RUNNERUP';
+            } 
+        } else {
+            template = 'PARTICIPATION';
+        }
         setFormData((prevData) => ({
             ...prevData,
-            isWinner,
+            template,
         }));
-    }, [isWinner]);
+    }, [isWinner, isIndividual]);
+
     useEffect(() => {
         setFormData((prevData) => ({
             ...prevData,
@@ -47,6 +57,7 @@ export default function Generate() {
         certificateData.backgroundImage = backgroundImage;
         console.table(certificateData);
     }, [backgroundImage]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         const currentDate = new Date();
@@ -94,7 +105,6 @@ export default function Generate() {
     }
 
     const steps = ["Get Started", "Certificate Data", "User Data", "Publish"];
-
     const certificateData = {
         backgroundImage: backgroundImage,
         receiverName: "John Doe",
@@ -102,9 +112,10 @@ export default function Generate() {
         organizationName: "Organization Name",
         issuerName: "Issuer Name",
         issuerID: "Issuer ID",
-        organizationID: "Organization ID",
+        organizationID: JSON.parse(localStorage.getItem('user'))._id,
         recipientID: "Recipient ID",
-        dateOfIssuance: "Date of Issuance",
+        template: formData.template,
+        orgLogo: JSON.parse(localStorage.getItem('user')).orgLogo
     };
 
     const renderStepIndividual = () => {
@@ -183,8 +194,8 @@ export default function Generate() {
                             />
                             <input
                                 type="email"
-                                name="recieverEmail"
-                                value={formData.recieverEmail}
+                                name="userEmail"
+                                value={formData.userEmail}
                                 onChange={handleChange}
                                 placeholder="Reciever Email"
                                 required
@@ -232,6 +243,7 @@ export default function Generate() {
                                     <h3 className="preview-heading">Certificate Preview : </h3>
                                     <div className="preview">
                                         <Certificate
+                                            orgLogo={certificateData.orgLogo}
                                             backgroundImage={formData.backgroundImage}
                                             receiverName={formData.recieverName}
                                             eventName={formData.eventName}
@@ -241,6 +253,7 @@ export default function Generate() {
                                             organizationID={certificateData.organizationID}
                                             recipientID={certificateData.recipientID}
                                             dateOfIssuance={formData.dateOfIssuance}
+                                            template={formData.template}
                                         />
                                     </div>
                                     <div className="button-wrapper">

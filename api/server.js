@@ -241,6 +241,7 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
 
   // create certificate buffer
   const certificateBuffer = await genCertificate({
+    template,
     orgLogo,
     eventName,
     dateOfIssuance,
@@ -248,7 +249,6 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     recipientID,
     organizationID,
     organizationName,
-    template,
   });
 
   const folderName = userEmail;
