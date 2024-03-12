@@ -24,7 +24,7 @@ function App() {
           <Route path="/verify" element={<Verify />}/>
           <Route path="/signup" element={<Home user={user} setUser={setUser}/>}/>
           <Route path="/generate" element={<Generate />}/>
-          <Route path="/manage" element={<Manage />}/>
+          <Route path="/manage" element={<Manage user={user} />}/>
         </Switch>
       <Footer />
       </Router>

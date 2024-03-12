@@ -15,6 +15,9 @@ html, body, #root{
   width: 100%;
   overflow-x: hidden;
 }
+input{
+  color: black !important;
+}
 @font-face {
   font-family: 'Telegraf';
   src: url('./fonts/PPTelegraf-Regular.otf') format('opentype');

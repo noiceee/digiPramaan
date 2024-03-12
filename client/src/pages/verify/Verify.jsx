@@ -137,12 +137,12 @@ export default function Verify() {
             <img className="result-img" src="images/valid.gif" alt="" />
           </div>
           <div className="document-info">
-            <span>Event Name : {certificateData[0]}</span>
-            <span>Reciever Name : {certificateData[2]}</span>
-            <span>Issuer Name : {certificateData[5]}</span>
-            <span>Date of Issuance : {certificateData[1]}</span>
-            <span>Certificate ID : {certificateData[3]}</span>
-            <span>Organization ID : {certificateData[4]}</span>
+            <span>Event Name : {certificateData.eventName}</span>
+            <span>Reciever Name : {certificateData.recieverName}</span>
+            <span>Issuer Name : {certificateData.organizationName}</span>
+            <span>Date of Issuance : {certificateData.dateOfIssuance}</span>
+            <span>Certificate ID : {certificateData.certificateId}</span>
+            <span>Organization ID : {certificateData.organizationId}</span>
           </div>
           <div className="button-wrapper">
             <button className="cta">Download</button>
