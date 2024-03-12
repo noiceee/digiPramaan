@@ -60,15 +60,19 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
     await s3.upload(params).promise();
 
     // Generate a signed URL for the uploaded image
-    const urlParams = {
-      Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: key,
-      Expires: 0,
-    };
+    // const urlParams = {
+    //   Bucket: process.env.AWS_S3_BUCKET_NAME,
+    //   Key: key,
+    //   Expires: 0,
+    // };
 
-    const signedURL = s3.getSignedUrl("getObject", urlParams);
+    // const signedURL = s3.getSignedUrl("getObject", urlParams);
 
-    res.status(200).json({ success: true, url: signedURL });
+    // res.status(200).json({ success: true, url: signedURL });
+    const objectUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+
+    res.status(200).json({ success: true, url: objectUrl });
+
   } catch (err) {
     console.error("Error uploading image:", err);
     res.status(500).json({ success: false, message: "Failed to upload image" });
@@ -268,13 +272,16 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     }
 
     // Generate signed URL for the uploaded certificate
-    const urlParams = {
-      Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: key,
-      Expires: 0,
-    };
-    const certLink = s3.getSignedUrl("getObject", urlParams);
+    // const urlParams = {
+    //   Bucket: process.env.AWS_S3_BUCKET_NAME,
+    //   Key: key,
+    //   Expires: 0,
+    // };
+    // const certLink = s3.getSignedUrl("getObject", urlParams);
+    
+    const certLink = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
     console.log("Certificate uploaded to S3:", certLink);
+    // res.status(200).json({ success: true, url: objectUrl });
 
     // Add certificate details to the database
     await addCertificates({

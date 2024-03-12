@@ -20,12 +20,55 @@ export default function Generate( {user} ) {
     const [backgroundImage, setBackgroundImage] = useState(null);
     const [published, setPublished] = useState(false);
 
+    const handleUpload = async (file) => {
+
+        // if (!validFileTypes.find(type => type === file.type)) {
+        //     //   setError('File must be in JPG/PNG format');
+        //     return;
+        // }
+
+        const form = new FormData();
+        form.append('image', file);
+
+        try {
+            const response = await axios.post('http://localhost:8080/uploadImage', form, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            if (response.data.url instanceof Promise) {
+                const url = await response.data.url;
+                console.log("lmaoooooo");
+                console.log('Image uploaded:', url); // This should log the final URL
+                return url;
+            } else {
+                console.log('Image uploaded:', response.data.url); // This should log the final URL
+                return response.data.url;
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            // Handle errors
+        }        
+        
+    };
+
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         const reader = new FileReader();
 
         reader.onloadend = () => {
             setBackgroundImage(reader.result);
+            // const { name, value } = e.target;
+            // setFormData(prevData => ({
+            //     ...prevData,
+            //     [name]: value
+            // }));
+            handleUpload(file).then(url => {
+                setFormData(prev => ({
+                    ...prev,
+                    backgroundImage: url
+                }))
+            });
         };
 
         if (file) {
@@ -118,6 +161,7 @@ export default function Generate( {user} ) {
             dateOfIssuance: formattedDate
         }));
     }
+
 
     const steps = ["Get Started", "Certificate Data", "User Data", "Publish"];
     const certificateData = {
