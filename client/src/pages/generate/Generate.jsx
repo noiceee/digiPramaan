@@ -3,14 +3,15 @@ import IsIndividualToggle from "../../components/isIndividualToggle/IsIndividual
 import ProgressBar from "../../components/progressBar/ProgressBar";
 import "./generate.scss";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
-export default function Generate() {
+export default function Generate( {user} ) {
     const [step, setStep] = useState(1);
     const [isIndividual, setIsIndividual] = useState(true);
     const [isWinner, setIsWinner] = useState(true);
     const [formData, setFormData] = useState({
         recieverName: "",
-        userEmail: "",
+        recieverEmail: "",
         eventName: "",
         dateOfIssuance: "",
         backgroundImage: "",
@@ -84,12 +85,26 @@ export default function Generate() {
         setStep((prevStep) => prevStep - 1);
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Form submitted:", formData);
-
-        setPublished(true);
-    };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+          console.log("Form submitted:", formData);
+          setPublished("SENT");
+          const token = user.token; // Assuming you store the token in localStorage
+          const response = await axios.post(
+            "http://localhost:8080/generateCertificate",formData,
+            {
+              headers: {
+                "Authorization": token
+              }
+            }
+          );
+          setPublished("SUCCESS");
+        } catch (error) {
+          console.log(error.message);
+        //   setPublished(error.message);
+        }
+      };
 
     const setDate = () => {
         const currentDate = new Date();
@@ -194,8 +209,8 @@ export default function Generate() {
                             />
                             <input
                                 type="email"
-                                name="userEmail"
-                                value={formData.userEmail}
+                                name="recieverEmail"
+                                value={formData.recieverEmail}
                                 onChange={handleChange}
                                 placeholder="Reciever Email"
                                 required
@@ -226,17 +241,29 @@ export default function Generate() {
                 return (
                     <div className="step">
                         {
-                            published ?
+                            published  ?
                                 <>
-                                    <img src="images/tick.gif" alt="done" />
-                                    <h2 className="published">
-                                        Certificate Published Successfully!
-                                    </h2>
-                                    <div className="button-wrapper">
-                                        <button className="cta" onClick={() => window.location.href = '/generate'}>
-                                            Publish More
-                                        </button>
-                                    </div>
+                                {
+                                    published === "SUCCESS" ?
+                                    <>
+                                        <img src="images/tick.gif" alt="done" />
+                                        <h2 className="published">
+                                            Certificate Published Successfully!
+                                        </h2>
+                                        <div className="button-wrapper">
+                                            <button className="cta" onClick={() => window.location.href = '/generate'}>
+                                                Publish More
+                                            </button>
+                                        </div>
+                                    </>
+                                    :
+                                    <>
+                                        <img src="images/verifying.webp" alt="done" />
+                                        <h2 className="published">
+                                            Publishing...
+                                        </h2>
+                                    </>
+                                }
                                 </>
                                 :
                                 <>

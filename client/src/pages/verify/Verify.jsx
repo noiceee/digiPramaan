@@ -145,7 +145,7 @@ export default function Verify() {
             <span>Organization ID : {certificateData.organizationId}</span>
           </div>
           <div className="button-wrapper">
-            <button className="cta">Download</button>
+            {/* <button className="cta">Download</button> */}
             <button className="cta">Bulk Verify</button>
           </div>
         </div>
