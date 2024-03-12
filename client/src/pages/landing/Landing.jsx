@@ -79,6 +79,16 @@ export default function Landing({ user, setUser }) {
         }
     };
 
+    const handleKeyPress = (event) => {
+        if (event.key === "Enter") {
+            if (isIndividual){
+                signInIndividual();
+            } else {
+                signInOrganization();
+            }
+        }
+      };
+    
     return (
         <div className="home page">
             <div className="left-content">
@@ -96,7 +106,7 @@ export default function Landing({ user, setUser }) {
                         </div>
                         <div className="input-wrapper">
                             <input placeholder="Email" type="email" name="email" id="email" ref={emailRef} />
-                            <input placeholder="Password" type="password" id="password" ref={passwordRef} />
+                            <input placeholder="Password" type="password" id="password"  onKeyDown={handleKeyPress} ref={passwordRef} />
                         </div>
                         <button className="sign-in-button" onClick={isIndividual ? signInIndividual : signInOrganization}>Sign In</button>
                         <span className="sign-up">New User? <span onClick={() => {
