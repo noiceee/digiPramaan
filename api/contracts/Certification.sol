@@ -6,7 +6,7 @@ contract Certifications {
     struct certDetails {
         string eventName;
         string dateOfIssuance;
-        string recieverName;
+        string receiverName;
         string certificateId;
         string organizationId;
         string organizationName;

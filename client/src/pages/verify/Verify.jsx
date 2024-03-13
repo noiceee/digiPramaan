@@ -138,7 +138,7 @@ export default function Verify() {
           </div>
           <div className="document-info">
             <span>Event Name : {certificateData.eventName}</span>
-            <span>Reciever Name : {certificateData.recieverName}</span>
+            <span>receiver Name : {certificateData.receiverName}</span>
             <span>Issuer Name : {certificateData.organizationName}</span>
             <span>Date of Issuance : {certificateData.dateOfIssuance}</span>
             <span>Certificate ID : {certificateData.certificateId}</span>

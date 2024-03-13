@@ -7,7 +7,7 @@ function Certificate({ orgLogo, backgroundImage, receiverName, eventName, organi
       case 'PARTICIPATION':
         return (
           <div className="certificate" style={{ backgroundColor: 'rgb(240, 197, 145)', padding: '100px', textAlign: 'center', position: 'relative', backgroundPosition: 'center', backgroundSize: 'cover', width: '900px', maxHeight: '500px', backgroundImage: `url(${backgroundImage})` }}>
-            <img className="issuer-logo" src={`url('${orgLogo}')`} alt="Issuer Logo" style={{ height: '50px', position: 'absolute', left: '10px', top: '10px' }} />
+            <img className="issuer-logo" src={`${orgLogo}`} alt="Issuer Logo" style={{ height: '50px', position: 'absolute', left: '10px', top: '10px' }} />
             <img className="digi-logo" src="images/logo.png" alt="Digi Logo" style={{ height: '250px', position: 'absolute', right: '-30px', top: '-80px' }} />
             <div className="content-wrapper">
               <h1 className="title" style={{ fontSize: '50px', marginBottom: '50px' }}>Certificate of Participation</h1>
@@ -51,7 +51,7 @@ function Certificate({ orgLogo, backgroundImage, receiverName, eventName, organi
       case 'RUNNERUP':
         return (
           <div className="certificate" style={{ backgroundColor: 'rgb(240, 197, 145)', padding: '100px', textAlign: 'center', position: 'relative', backgroundPosition: 'center', backgroundSize: 'cover', width: '900px', maxHeight: '500px', backgroundImage: `url(${backgroundImage})` }}>
-            <img className="issuer-logo" src={`url(${orgLogo})`} alt="Issuer Logo" style={{ height: '50px', position: 'absolute', left: '10px', top: '10px' }} />
+            <img className="issuer-logo" src={`${orgLogo}`} alt="Issuer Logo" style={{ height: '50px', position: 'absolute', left: '10px', top: '10px' }} />
             <img className="digi-logo" src="images/logo.png" alt="Digi Logo" style={{ height: '250px', position: 'absolute', right: '-30px', top: '-80px' }} />
             <div className="content-wrapper">
               <h1 className="title" style={{ fontSize: '50px', marginBottom: '50px' }}>Certificate of Achievement</h1>
@@ -73,7 +73,7 @@ function Certificate({ orgLogo, backgroundImage, receiverName, eventName, organi
       default:
         return (
           <div className="certificate" style={{ backgroundColor: 'rgb(240, 197, 145)', padding: '100px', textAlign: 'center', position: 'relative', backgroundPosition: 'center', backgroundSize: 'cover', width: '900px', maxHeight: '500px', backgroundImage: `url(${backgroundImage})` }}>
-            <img className="issuer-logo" src={`url(${orgLogo})`} alt="Issuer Logo" style={{ height: '50px', position: 'absolute', left: '10px', top: '10px' }} />
+            <img className="issuer-logo" src={`${orgLogo}`} alt="Issuer Logo" style={{ height: '50px', position: 'absolute', left: '10px', top: '10px' }} />
             <img className="digi-logo" src="images/logo.png" alt="Digi Logo" style={{ height: '250px', position: 'absolute', right: '-30px', top: '-80px' }} />
             <div className="content-wrapper">
               <h1 className="title" style={{ fontSize: '50px', marginBottom: '50px' }}>Certificate of Participation</h1>
