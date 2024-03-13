@@ -57,9 +57,9 @@
 </head>
 
 <body>
-  <div class="certificate">
-    <img class="issuer-logo" src='{{imgSrc}}'></img>
-    <img class="digi-logo" src="../logo.png"></img>
+  <div class="certificate" style='background-image: url({{backgroundImage}});'>
+    <img class="issuer-logo" src="{{orgLogo}}" width="200" height="450"></img>
+    <img class="digi-logo" src="https://digipramaan.s3.ap-south-1.amazonaws.com/assets/logo.png"></img>
     <div class="content-wrapper">
       <h1 class="title">Certificate of Achievement</h1>
       <p class="content">
@@ -70,9 +70,9 @@
       </p>
       <div class="certificate-info">
         <!-- <div class="issuer-info">Issued by: {{issuerName}} (Issuer ID: {{issuerID}})</div> -->
-        <div className="organization-id">Organization ID: {{organizationID}}</div>
-        <div className="recipient-id">Received by: {{receiverName}}</div>
-        <div className="recipient-id">Recipient ID: {{recipientID}}</div>
+        <div className="organization-id">Organization ID: {{organizationId}}</div>
+        <div className="recipient-id">Received by: {{recieverName}}</div>
+        <div className="recipient-id">Recipient ID: {{certificateId}}</div>
         <div className="issuer-info">Date of Issuance: {{dateOfIssuance}}</div>
       </div>
     </div>

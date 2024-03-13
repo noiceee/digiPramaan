@@ -7,45 +7,25 @@ contract Certifications {
         string eventName;
         string dateOfIssuance;
         string recieverName;
-        string recipientID;
-        string organizationID;
+        string certificateId;
+        string organizationId;
         string organizationName;
     }
 
     mapping(string => certDetails) private hashes;
 
-    function appendCertificate(
-        string memory _eventName,
-        string memory _dateOfIssuance,
-        string memory _recieverName,
-        string memory _recipientID,
-        string memory _organizationID,
-        string memory _organizationName,
-        string memory _hash
-    ) public{
-        // Adding given certificate data to the blockchain
-        hashes[_hash] = certDetails(
-            _eventName,
-            _dateOfIssuance,
-            _recieverName,
-            _recipientID,
-            _organizationID,
-            _organizationName
-        );
+    function appendCertificates(certDetails[] memory _certificates, string[] memory _hashes) public {
+        require(_certificates.length == _hashes.length, "Array lengths do not match");
 
-        require(bytes(hashes[_hash].eventName).length > 0, "Certificate creation unsuccessful");
+        for (uint256 i = 0; i < _certificates.length; i++) {
+            hashes[_hashes[i]] = _certificates[i];
+            require(bytes(hashes[_hashes[i]].eventName).length > 0, "Certificate creation unsuccessful");
+        }
     }
 
-    function verifyCertification(
-        string memory _hash
-    ) public view returns (certDetails memory) {
+    function verifyCertification(string memory _hash) public view returns (certDetails memory) {
         require(bytes(_hash).length > 0, "Hash value cannot be empty");
-
-        require(
-            bytes(hashes[_hash].eventName).length > 0,
-            "Certificate not found for the given hash"
-        );
-
+        require(bytes(hashes[_hash].eventName).length > 0, "Certificate not found for the given hash");
         return hashes[_hash];
     }
 }
