@@ -23,6 +23,7 @@ async function genCertificate(jsonData) {
     const htmlContent = htmlTemplate
       .replace("{{orgLogo}}", jsonData.orgLogo)
       .replace("{{eventName}}", jsonData.eventName)
+      .replace("{{backgroundImage}}", jsonData.backgroundImage)
       .replace("{{dateOfIssuance}}", jsonData.dateOfIssuance)
       .replaceAll("{{recieverName}}", jsonData.recieverName)
       .replace("{{certificateId}}", jsonData.certificateId)
@@ -37,7 +38,7 @@ async function genCertificate(jsonData) {
 
     await page.setContent(htmlContent, { waitUntil: "load" });
 
-    const pdfBuffer = await page.pdf({ height: 561, printBackground: true });
+    const pdfBuffer = await page.pdf({ height: 541, printBackground: true });
 
     await browser.close();
 

@@ -69,10 +69,9 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
     // const signedURL = s3.getSignedUrl("getObject", urlParams);
 
     // res.status(200).json({ success: true, url: signedURL });
-    const objectUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    const objectUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${key}`;
 
     res.status(200).json({ success: true, url: objectUrl });
-
   } catch (err) {
     console.error("Error uploading image:", err);
     res.status(500).json({ success: false, message: "Failed to upload image" });
@@ -81,7 +80,7 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
 
 // LOGIN AND SIGNUP FACILITY FOR COMPANIES/ORGANISATIONS
 app.post("/orgRegistration", (req, res) => {
-  const { email, orgName, orgLogo, orgSignature, password } = req.body;
+  const { email, orgName, orgLogo, password } = req.body;
 
   bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
     if (err) {
@@ -93,7 +92,6 @@ app.post("/orgRegistration", (req, res) => {
       email,
       orgName,
       orgLogo,
-      orgSignature,
       password: hashedPassword,
     });
 
@@ -215,12 +213,10 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/generateCertificate", verifyToken, async (req, res) => {
-  const { eventName, recieverName, recieverEmail, template } = req.body;
-
+  const { recipients, template, backgroundImage } = req.body;
   const token = req.headers["authorization"];
 
   try {
-    // Fetching issuer data from the database
     const decoded = jwt.verify(token, process.env.JWT_KEY);
     const userId = decoded.userId;
 
@@ -233,82 +229,80 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
       throw new Error("Issuer data not found");
     }
 
-    // Creating required variables for certificate creation
     const dateOfIssuance = new Date().toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     });
-    const { orgName, orgLogo, orgSignature } = issuerData;
+
+    const { orgName, orgLogo } = issuerData;
     const organizationId = String(issuerData._id);
-    const certificateId = uuidv4();
 
-    // Generate certificate buffer
-    const certificateBuffer = await genCertificate({
-      template,
-      orgLogo,
-      eventName,
-      dateOfIssuance,
-      recieverName,
-      certificateId,
-      organizationId,
-      organizationName: orgName,
-    });
+    const certificatesData = [];
+    const hashes = [];
 
-    // Upload certificate to AWS S3
-    const folderName = recieverEmail;
-    const certificateFileName = certificateId + ".pdf";
-    const key = `${folderName}/${certificateFileName}`;
-    const uploadParams = {
-      Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: key,
-      Body: certificateBuffer,
-      ContentType: "application/pdf",
-    };
+    for (const recipient of recipients) {
+      const { eventName, recieverName, recieverEmail } = recipient;
+      const certificateId = uuidv4();
 
-    const uploadCert = await s3.upload(uploadParams).promise();
-    if (!uploadCert || !uploadCert.Location) {
-      throw new Error("Failed to upload certificate to AWS S3");
+      const certificateBuffer = await genCertificate({
+        template,
+        orgLogo,
+        backgroundImage,
+        eventName,
+        dateOfIssuance,
+        recieverName,
+        certificateId,
+        organizationId,
+        organizationName: orgName,
+      });
+
+      const folderName = recieverEmail;
+      const certificateFileName = certificateId + ".pdf";
+      const key = `${folderName}/${certificateFileName}`;
+      const uploadParams = {
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: key,
+        Body: certificateBuffer,
+        ContentType: "application/pdf",
+      };
+
+      const uploadCert = await s3.upload(uploadParams).promise();
+      if (!uploadCert || !uploadCert.Location) {
+        throw new Error("Failed to upload certificate to AWS S3");
+      }
+
+      const certLink = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${key}`;
+
+      await addCertificates({
+        recieverEmail,
+        eventName,
+        orgLogo,
+        certLink,
+        dateOfIssuance,
+        certificateId,
+      });
+
+      const hash = crypto
+        .createHash("sha256")
+        .update(certificateBuffer)
+        .digest("hex");
+
+      certificatesData.push({
+        eventName,
+        dateOfIssuance,
+        recieverName,
+        certificateId,
+        organizationId,
+        organizationName: orgName,
+      });
+
+      hashes.push(hash);
     }
 
-    // Generate signed URL for the uploaded certificate
-    // const urlParams = {
-    //   Bucket: process.env.AWS_S3_BUCKET_NAME,
-    //   Key: key,
-    //   Expires: 0,
-    // };
-    // const certLink = s3.getSignedUrl("getObject", urlParams);
-    
-    const certLink = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
-    console.log("Certificate uploaded to S3:", certLink);
-    // res.status(200).json({ success: true, url: objectUrl });
-
-    // Add certificate details to the database
-    await addCertificates({
-      recieverEmail,
-      eventName,
-      orgLogo,
-      certLink,
-      dateOfIssuance,
-      certificateId,
-    });
-
-    // Create hash of the certificate buffer
-    const hash = crypto
-      .createHash("sha256")
-      .update(certificateBuffer)
-      .digest("hex");
-    console.log("Certificate created successfully with hash:", hash);
-
-    // Store data on the blockchain network
-    const blockchainResponse = await blockchain.generateCertificate(
-      eventName,
-      dateOfIssuance,
-      recieverName,
-      certificateId,
-      organizationId,
-      orgName,
-      hash
+    const blockchainResponse = await blockchain.generateCertificates(
+      certificatesData,
+      hashes
     );
 
     const { transactionHash, blockHash } = blockchainResponse.receipt;
@@ -328,7 +322,6 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
   }
 });
 
-// Error handeling done
 app.get("/verifyCertificate/:hash", async (req, res) => {
   const _hash = req.params.hash;
 

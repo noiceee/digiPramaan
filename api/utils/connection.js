@@ -71,15 +71,7 @@ const verifyCertificate = async function (_hash) {
   }
 };
 
-const generateCertificate = async function (
-  eventName,
-  dateOfIssuance,
-  recieverName,
-  recipientID,
-  organizationID,
-  organizationName,
-  hash
-) {
+const generateCertificates = async function (certificatesData, hashes) {
   const self = this;
 
   try {
@@ -89,14 +81,9 @@ const generateCertificate = async function (
     const accountAddress = accounts[0];
 
     const instance = await certificationInstance.deployed();
-    const gasEstimate = await instance.appendCertificate.estimateGas(
-      eventName,
-      dateOfIssuance,
-      recieverName,
-      recipientID,
-      organizationID,
-      organizationName,
-      hash,
+    const gasEstimate = await instance.appendCertificates.estimateGas(
+      certificatesData,
+      hashes,
       { from: accountAddress.toLowerCase() }
     );
 
@@ -107,18 +94,13 @@ const generateCertificate = async function (
     console.log("Gas Limit: ", gasLimit);
 
     // Now execute the transaction with the adjusted gas limit
-    const receipt = await instance.appendCertificate(
-      eventName,
-      dateOfIssuance,
-      recieverName,
-      recipientID,
-      organizationID,
-      organizationName,
-      hash,
+    const receipt = await instance.appendCertificates(
+      certificatesData,
+      hashes,
       { from: accountAddress.toLowerCase(), gas: gasLimit }
     );
 
-    console.log("Certificate generated successfully!");
+    console.log("Certificates generated successfully!");
 
     return receipt;
   } catch (error) {
@@ -130,6 +112,6 @@ const generateCertificate = async function (
 module.exports = {
   connectWeb3,
   getAccounts,
-  generateCertificate,
+  generateCertificates,
   verifyCertificate,
 };
