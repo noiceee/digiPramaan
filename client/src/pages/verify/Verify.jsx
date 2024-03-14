@@ -146,7 +146,9 @@ export default function Verify() {
           </div>
           <div className="button-wrapper">
             {/* <button className="cta">Download</button> */}
-            <button className="cta">Bulk Verify</button>
+            <button className="cta" onClick={()=>{
+              window.location.href = "/verify"
+            }}>Verify Again</button>
           </div>
         </div>
       ) : (
@@ -161,7 +163,7 @@ export default function Verify() {
             <button className="cta" onClick={()=>{
               window.location.href = "/verify"
             }}>Verify Again</button>
-            <button className="cta">Bulk Verify</button>
+            {/* <button className="cta">Bulk Verify</button> */}
           </div>
         </div>
       ) : (
