@@ -2,7 +2,7 @@ const Certificates = require("../models/certificates");
 
 const addCertificates = async (certDetails) => {
   const {
-    recieverEmail,
+    receiverEmail,
     eventName,
     orgLogo,
     certLink,
@@ -12,7 +12,7 @@ const addCertificates = async (certDetails) => {
 
   try {
     const certInstance = new Certificates({
-      recieverEmail,
+      receiverEmail,
       eventName,
       orgLogo,
       certLink,

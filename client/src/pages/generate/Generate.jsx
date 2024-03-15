@@ -4,14 +4,15 @@ import ProgressBar from "../../components/progressBar/ProgressBar";
 import "./generate.scss";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Papa from 'papaparse'; // Import PapaParse for CSV parsing
 
-export default function Generate( {user} ) {
+export default function Generate({ user }) {
     const [step, setStep] = useState(1);
     const [isIndividual, setIsIndividual] = useState(true);
     const [isWinner, setIsWinner] = useState(true);
     const [formData, setFormData] = useState({
-        recieverName: "",
-        recieverEmail: "",
+        receiverName: "",
+        receiverEmail: "",
         eventName: "",
         dateOfIssuance: "",
         backgroundImage: "",
@@ -19,6 +20,33 @@ export default function Generate( {user} ) {
     });
     const [backgroundImage, setBackgroundImage] = useState(null);
     const [published, setPublished] = useState(false);
+    const [csvData, setCsvData] = useState([]);
+
+    const handleFileChange = (e) => {
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 because month is zero-based
+        const day = String(currentDate.getDate()).padStart(2, '0');
+
+        const formattedDate = `${day}-${month}-${year}`;
+        setFormData((prevData) => ({
+            ...prevData,
+            dateOfIssuance: formattedDate
+        }));
+        const file = e.target.files[0];
+        if (file) {
+            Papa.parse(file, {
+                complete: (result) => {
+                    // Assuming the CSV file has headers: Receiver Name, Receiver Email, Event Name
+                    const data = result.data; // Remove the header row
+                    console.log(data);
+                    setCsvData(data);
+                },
+                header: true // Indicates that the first row contains headers
+            });
+        }
+    };
+
 
     const handleUpload = async (file) => {
 
@@ -48,8 +76,8 @@ export default function Generate( {user} ) {
         } catch (error) {
             console.error('Error uploading image:', error);
             // Handle errors
-        }        
-        
+        }
+
     };
 
     const handleImageChange = (e) => {
@@ -78,12 +106,12 @@ export default function Generate( {user} ) {
 
     useEffect(() => {
         let template;
-        if(isIndividual) {
-            if(isWinner){
+        if (isIndividual) {
+            if (isWinner) {
                 template = 'WINNER';
             } else {
                 template = 'RUNNERUP';
-            } 
+            }
         } else {
             template = 'PARTICIPATION';
         }
@@ -121,6 +149,7 @@ export default function Generate( {user} ) {
         e.preventDefault();
         console.log("Form submitted:", formData);
         setStep((prevStep) => prevStep + 1);
+        console.log(certificateData);
     };
 
     const handleBack = (e) => {
@@ -131,23 +160,34 @@ export default function Generate( {user} ) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-          console.log("Form submitted:", formData);
-          setPublished("SENT");
-          const token = user.token; // Assuming you store the token in localStorage
-          const response = await axios.post(
-            "http://localhost:8080/generateCertificate",formData,
-            {
-              headers: {
-                "Authorization": token
-              }
+            console.log("Form submitted:", formData);
+            console.log("CSV submitted:", csvData);
+            const toSend = isIndividual ? {
+                'recipients' : [formData],
+                'template' : formData.template,
+                'backgroundImage' : formData.backgroundImage
+            } : {
+                'recipients' : [...csvData],
+                'template' : formData.template,
+                'backgroundImage' : formData.backgroundImage
             }
-          );
-          setPublished("SUCCESS");
+            console.log(toSend);
+            setPublished("SENT");
+            const token = user.token; // Assuming you store the token in localStorage
+            const response = await axios.post(
+                "http://localhost:8080/generateCertificate", toSend,
+                {
+                    headers: {
+                        "Authorization": token
+                    }
+                }
+            );
+            setPublished("SUCCESS");
         } catch (error) {
-          console.log(error.message);
-        //   setPublished(error.message);
+            console.log(error.message);
+            //   setPublished(error.message);
         }
-      };
+    };
 
     const setDate = () => {
         const currentDate = new Date();
@@ -168,7 +208,7 @@ export default function Generate( {user} ) {
         backgroundImage: backgroundImage,
         receiverName: "John Doe",
         eventName: "Event Name",
-        organizationName: "Organization Name",
+        organizationName: JSON.parse(localStorage.getItem('user')).orgName,
         issuerName: "Issuer Name",
         issuerID: "Issuer ID",
         organizationID: JSON.parse(localStorage.getItem('user'))._id,
@@ -245,18 +285,18 @@ export default function Generate( {user} ) {
                         <div className="input-wrapper">
                             <input
                                 type="text"
-                                name="recieverName"
-                                value={formData.recieverName}
+                                name="receiverName"
+                                value={formData.receiverName}
                                 onChange={handleChange}
-                                placeholder="Reciever Name"
+                                placeholder="receiver Name"
                                 required
                             />
                             <input
                                 type="email"
-                                name="recieverEmail"
-                                value={formData.recieverEmail}
+                                name="receiverEmail"
+                                value={formData.receiverEmail}
                                 onChange={handleChange}
-                                placeholder="Reciever Email"
+                                placeholder="receiver Email"
                                 required
                             />
                             <input
@@ -272,7 +312,7 @@ export default function Generate( {user} ) {
                             <button className="cta" onClick={handleBack}>
                                 Back
                             </button>
-                            <button className="cta" onClick={(e)=>{
+                            <button className="cta" onClick={(e) => {
                                 setDate();
                                 handleNext(e);
                             }}>
@@ -285,29 +325,29 @@ export default function Generate( {user} ) {
                 return (
                     <div className="step">
                         {
-                            published  ?
+                            published ?
                                 <>
-                                {
-                                    published === "SUCCESS" ?
-                                    <>
-                                        <img src="images/tick.gif" alt="done" />
-                                        <h2 className="published">
-                                            Certificate Published Successfully!
-                                        </h2>
-                                        <div className="button-wrapper">
-                                            <button className="cta" onClick={() => window.location.href = '/generate'}>
-                                                Publish More
-                                            </button>
-                                        </div>
-                                    </>
-                                    :
-                                    <>
-                                        <img src="images/verifying.webp" alt="done" />
-                                        <h2 className="published">
-                                            Publishing...
-                                        </h2>
-                                    </>
-                                }
+                                    {
+                                        published === "SUCCESS" ?
+                                            <>
+                                                <img src="images/tick.gif" alt="done" />
+                                                <h2 className="published">
+                                                    Certificate Published Successfully!
+                                                </h2>
+                                                <div className="button-wrapper">
+                                                    <button className="cta" onClick={() => window.location.href = '/generate'}>
+                                                        Publish More
+                                                    </button>
+                                                </div>
+                                            </>
+                                            :
+                                            <>
+                                                <img src="images/verifying.webp" alt="done" />
+                                                <h2 className="published">
+                                                    Publishing...
+                                                </h2>
+                                            </>
+                                    }
                                 </>
                                 :
                                 <>
@@ -316,7 +356,7 @@ export default function Generate( {user} ) {
                                         <Certificate
                                             orgLogo={certificateData.orgLogo}
                                             backgroundImage={formData.backgroundImage}
-                                            receiverName={formData.recieverName}
+                                            receiverName={formData.receiverName}
                                             eventName={formData.eventName}
                                             organizationName={certificateData.organizationName}
                                             issuerName={certificateData.issuerName}
@@ -364,26 +404,33 @@ export default function Generate( {user} ) {
             case 2:
                 return (
                     <div className="step step-2">
+                        <div className="togglecontainer">
+                            <div className="tab-wrapper">
+                                <span className="active">Participation</span>
+                            </div>
+                        </div>
                         <div className="input-wrapper">
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                placeholder="Name"
-                                required
-                            />
-                            <input
-                                style={{
-                                    "-moz-appearance": "textfield",
-                                    appearance: "textField",
-                                }}
-                                type="number"
-                                placeholder="Phone number"
-                                value={formData.phone}
-                                name="phone"
-                                onChange={handleChange}
-                            />
+                            <h4>Upload background image (Optional)</h4>
+                            {/* <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
+                            <input style={{ '-moz-appearance': 'textfield', 'appearance': 'textField' }} type="number" placeholder='Phone number' value={formData.phone} name='phone' onChange={handleChange} /> */}
+                            <div className="image-input">
+                                <input
+                                    type="file"
+                                    name="backgroundImage"
+                                    id="backgroundImage"
+                                    accept="image/"
+                                    onChange={handleImageChange}
+                                />
+                                {backgroundImage && (
+                                    <div>
+                                        <img
+                                            src={backgroundImage}
+                                            alt="Uploaded"
+                                            style={{ maxWidth: "100px" }}
+                                        />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className="button-wrapper">
                             <button className="cta" onClick={handleBack}>
@@ -397,32 +444,39 @@ export default function Generate( {user} ) {
                 );
             case 3:
                 return (
-                    <div className="step-2">
+                    <div className="step step-3">
+                        {/* <div className="togglecontainer">
+                            <div className="tab-wrapper">
+                                <span className= "active">Participation</span>
+                            </div>
+                        </div> */}
                         <div className="input-wrapper">
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder="Email"
-                                required
-                            />
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                placeholder="Password"
-                                required
-                            />
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                placeholder="Confirm Password"
-                                required
-                            />
+                            <h4>Upload CSV containing folowing data: <br /></h4>
+                            <ul>
+                                <li>receiverName</li>
+                                <li>receiverEmail</li>
+                                <li>eventName</li>
+                            </ul>
+                            {/* <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
+                            <input style={{ '-moz-appearance': 'textfield', 'appearance': 'textField' }} type="number" placeholder='Phone number' value={formData.phone} name='phone' onChange={handleChange} /> */}
+                            <div className="image-input">
+                                <input
+                                    type="file"
+                                    name="csvFile"
+                                    id="csvFile"
+                                    accept=".csv"
+                                    onChange={handleFileChange}
+                                />
+                                {/* {backgroundImage && (
+                                    <div>
+                                        <img
+                                            src={backgroundImage}
+                                            alt="Uploaded"
+                                            style={{ maxWidth: "100px" }}
+                                        />
+                                    </div>
+                                )} */}
+                            </div>
                         </div>
                         <div className="button-wrapper">
                             <button className="cta" onClick={handleBack}>
@@ -436,18 +490,60 @@ export default function Generate( {user} ) {
                 );
             case 4:
                 return (
-                    <div>
-                        <p>Please review your information before submitting:</p>
-                        <p>Name: {formData.name}</p>
-                        <p>Email: {formData.email}</p>
-                        <div className="button-wrapper">
-                            <button className="cta" onClick={handleBack}>
-                                Back
-                            </button>
-                            <button className="cta" onClick={handleSubmit}>
-                                Submit
-                            </button>
-                        </div>
+                    <div className="step">
+                        {
+                            published ?
+                                <>
+                                    {
+                                        published === "SUCCESS" ?
+                                            <>
+                                                <img src="images/tick.gif" alt="done" />
+                                                <h2 className="published">
+                                                    Certificate Published Successfully!
+                                                </h2>
+                                                <div className="button-wrapper">
+                                                    <button className="cta" onClick={() => window.location.href = '/generate'}>
+                                                        Publish More
+                                                    </button>
+                                                </div>
+                                            </>
+                                            :
+                                            <>
+                                                <img src="images/verifying.webp" alt="done" />
+                                                <h2 className="published">
+                                                    Publishing...
+                                                </h2>
+                                            </>
+                                    }
+                                </>
+                                :
+                                <>
+                                    <h3 className="preview-heading">Certificate Preview : </h3>
+                                    <div className="preview">
+                                        <Certificate
+                                            orgLogo={certificateData.orgLogo}
+                                            backgroundImage={formData.backgroundImage}
+                                            receiverName={csvData[0].receiverName}
+                                            eventName={csvData[0].eventName}
+                                            organizationName={certificateData.organizationName}
+                                            issuerName={certificateData.issuerName}
+                                            issuerID={certificateData.issuerID}
+                                            organizationID={certificateData.organizationID}
+                                            recipientID={certificateData.recipientID}
+                                            dateOfIssuance={formData.dateOfIssuance}
+                                            template={formData.template}
+                                        />
+                                    </div>
+                                    <div className="button-wrapper">
+                                        <button className="cta" onClick={handleBack}>
+                                            Back
+                                        </button>
+                                        <button className="cta" onClick={handleSubmit}>
+                                            Publish
+                                        </button>
+                                    </div>
+                                </>
+                        }
                     </div>
                 );
             default:

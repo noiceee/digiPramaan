@@ -25,7 +25,7 @@ async function genCertificate(jsonData) {
       .replace("{{eventName}}", jsonData.eventName)
       .replace("{{backgroundImage}}", jsonData.backgroundImage)
       .replace("{{dateOfIssuance}}", jsonData.dateOfIssuance)
-      .replaceAll("{{recieverName}}", jsonData.recieverName)
+      .replaceAll("{{receiverName}}", jsonData.receiverName)
       .replace("{{certificateId}}", jsonData.certificateId)
       .replace("{{organizationId}}", jsonData.organizationId)
       .replace("{{organizationName}}", jsonData.organizationName);

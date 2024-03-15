@@ -138,7 +138,7 @@ export default function Verify() {
           </div>
           <div className="document-info">
             <span>Event Name : {certificateData.eventName}</span>
-            <span>Reciever Name : {certificateData.recieverName}</span>
+            <span>receiver Name : {certificateData.receiverName}</span>
             <span>Issuer Name : {certificateData.organizationName}</span>
             <span>Date of Issuance : {certificateData.dateOfIssuance}</span>
             <span>Certificate ID : {certificateData.certificateId}</span>
@@ -146,7 +146,9 @@ export default function Verify() {
           </div>
           <div className="button-wrapper">
             {/* <button className="cta">Download</button> */}
-            <button className="cta">Bulk Verify</button>
+            <button className="cta" onClick={()=>{
+              window.location.href = "/verify"
+            }}>Verify Again</button>
           </div>
         </div>
       ) : (
@@ -161,7 +163,7 @@ export default function Verify() {
             <button className="cta" onClick={()=>{
               window.location.href = "/verify"
             }}>Verify Again</button>
-            <button className="cta">Bulk Verify</button>
+            {/* <button className="cta">Bulk Verify</button> */}
           </div>
         </div>
       ) : (

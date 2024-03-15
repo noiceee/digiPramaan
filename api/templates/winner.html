@@ -16,15 +16,18 @@
     html,
     body {
       width: 100%;
-      max-height: 500px;
+      /* max-height: 500px; */
     }
 
     .certificate {
-      background-color: rgb(255, 203, 139);
-      padding: 100px;
-      text-align: center;
-      position: relative;
-    }
+            background-color: rgb(240, 197, 145);
+            color: white;
+            padding: 100px;
+            text-align: center;
+            position: relative;
+            background-position: center;
+            background-size: cover;
+        }
 
     .certificate>img {
       height: 50px;
@@ -58,12 +61,12 @@
 
 <body>
   <div class="certificate" style='background-image: url({{backgroundImage}});'>
-    <img class="issuer-logo" src="{{orgLogo}}" width="200" height="450"></img>
+    <img class="issuer-logo" src="{{orgLogo}}"></img>
     <img class="digi-logo" src="https://digipramaan.s3.ap-south-1.amazonaws.com/assets/logo.png"></img>
     <div class="content-wrapper">
       <h1 class="title">Certificate of Achievement</h1>
       <p class="content">
-        This is to certify that <strong><u>{{recieverName}}</u></strong> has secured 1st rank in the event:
+        This is to certify that <strong><u>{{receiverName}}</u></strong> has secured 1st rank in the event:
         <em>{{eventName}}</em>
         <br>
         Organized by {{organizationName}}
@@ -71,7 +74,7 @@
       <div class="certificate-info">
         <!-- <div class="issuer-info">Issued by: {{issuerName}} (Issuer ID: {{issuerID}})</div> -->
         <div className="organization-id">Organization ID: {{organizationId}}</div>
-        <div className="recipient-id">Received by: {{recieverName}}</div>
+        <div className="recipient-id">Received by: {{receiverName}}</div>
         <div className="recipient-id">Recipient ID: {{certificateId}}</div>
         <div className="issuer-info">Date of Issuance: {{dateOfIssuance}}</div>
       </div>

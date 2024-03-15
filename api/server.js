@@ -242,7 +242,7 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
     const hashes = [];
 
     for (const recipient of recipients) {
-      const { eventName, recieverName, recieverEmail } = recipient;
+      const { eventName, receiverName, receiverEmail } = recipient;
       const certificateId = uuidv4();
 
       const certificateBuffer = await genCertificate({
@@ -251,13 +251,13 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
         backgroundImage,
         eventName,
         dateOfIssuance,
-        recieverName,
+        receiverName,
         certificateId,
         organizationId,
         organizationName: orgName,
       });
 
-      const folderName = recieverEmail;
+      const folderName = receiverEmail;
       const certificateFileName = certificateId + ".pdf";
       const key = `${folderName}/${certificateFileName}`;
       const uploadParams = {
@@ -275,7 +275,7 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
       const certLink = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${key}`;
 
       await addCertificates({
-        recieverEmail,
+        receiverEmail,
         eventName,
         orgLogo,
         certLink,
@@ -291,7 +291,7 @@ app.post("/generateCertificate", verifyToken, async (req, res) => {
       certificatesData.push({
         eventName,
         dateOfIssuance,
-        recieverName,
+        receiverName,
         certificateId,
         organizationId,
         organizationName: orgName,
@@ -331,7 +331,7 @@ app.get("/verifyCertificate/:hash", async (req, res) => {
     const formattedData = {
       eventName: data[0],
       dateOfIssuance: data[1],
-      recieverName: data[2],
+      receiverName: data[2],
       certificateId: data[3],
       organizationId: data[4],
       organizationName: data[5],
@@ -372,7 +372,7 @@ app.get("/getCertificates/:certOwnerEmail", verifyToken, async (req, res) => {
 
     // Fetching all certificates issued to a user
     const certDetails = await Certificates.find({
-      recieverEmail: certOwnerEmail,
+      receiverEmail: certOwnerEmail,
     });
 
     console.log("[SUCCESS] Certificates retrieved successfully");

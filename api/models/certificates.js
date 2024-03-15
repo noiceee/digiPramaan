@@ -1,7 +1,7 @@
 const { mongoose } = require("./mongoose");
 
 const certificatesSchema = new mongoose.Schema({
-  recieverEmail: {
+  receiverEmail: {
     type: String,
     required: true,
     trim: true,
