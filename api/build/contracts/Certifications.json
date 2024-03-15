@@ -100,8 +100,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"eventName\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOfIssuance\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"recieverName\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"certificateId\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"organizationId\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"organizationName\",\"type\":\"string\"}],\"internalType\":\"struct Certifications.certDetails[]\",\"name\":\"_certificates\",\"type\":\"tuple[]\"},{\"internalType\":\"string[]\",\"name\":\"_hashes\",\"type\":\"string[]\"}],\"name\":\"appendCertificates\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_hash\",\"type\":\"string\"}],\"name\":\"verifyCertification\",\"outputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"eventName\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOfIssuance\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"recieverName\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"certificateId\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"organizationId\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"organizationName\",\"type\":\"string\"}],\"internalType\":\"struct Certifications.certDetails\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Certification.sol\":\"Certifications\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/Certification.sol\":{\"keccak256\":\"0x485dd85a6ddb2d015e9ad780e47ab21b6d7e9e08008b8823a07be3a10ab509d6\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://fb63d4948e0cf0522837c0d80ea6e0c1619dc51a0e984aaa059864382966feb1\",\"dweb:/ipfs/QmPqSJsEdoqrQWNM7gxL1TwnoHxDtkcsFzRGygRd5p3m6x\"]}},\"version\":1}",
@@ -13239,19 +13238,18 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x4B85E2D5Ad8Df49833b3Cdc58cEb14CBd39EF9E7",
-      "transactionHash": "0x6d94f70c1318975b7e9e2d1d27889e3e68c75aecf95863512017a00be2491ab7"
+      "address": "0x78Afd1560ccD42C6620D016e5e36c0707B004D19",
+      "transactionHash": "0xcafdd67f073496d75a8061b4b5243e5b3b53931c5d8868bdff244a23d756f717"
     },
     "11155111": {
       "events": {},
       "links": {},
-      "address": "0xEcbA4aB6dc77E1AF0Bbb23E873A6cFAEb3506184",
-      "transactionHash": "0x45c8a9bfdaa8d0b383fd5eb1585f3e45c12c62c263993709b38d5589bdf348b7"
+      "address": "0xB3a29d94c81FAF7eFD4989eB06a66C52CEFF9273",
+      "transactionHash": "0x03662c3e84228bf9515022b14334cb31eac3c2dc2a2ab8624149d063fa448c7b"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-03-12T18:02:43.332Z",
-  "networkType": "ethereum",
+  "updatedAt": "2024-03-13T05:35:30.234Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
