@@ -42,6 +42,17 @@ input:-webkit-autofill:active
 .page{
   padding: 5%;
   min-height: calc(100% - 100px);
+  position: relative;
+  overflow: hidden;
+  .background-stripe{
+    position: absolute;
+    right: -6%;
+    top: 50%;
+    height: 100vh;
+    opacity: 0;
+    z-index: 0;
+    animation: fadeIn forwards 1s;
+  }
 }
 /* Change the main scrollbar */
 ::-webkit-scrollbar {

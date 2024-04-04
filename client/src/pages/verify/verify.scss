@@ -26,6 +26,7 @@
             background-color: var(--strong-pink);
             color: white;
             width: min-content;
+            z-index: 1;
             &.input{
                 width: 60vw;
             }
