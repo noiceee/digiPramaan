@@ -15,6 +15,10 @@ html, body, #root{
   width: 100%;
   overflow-x: hidden;
 }
+
+.error-text{
+  color: red;
+}
 /* Style for input when autofill occurs */
 input:-webkit-autofill,  
 input:-webkit-autofill:hover,  
