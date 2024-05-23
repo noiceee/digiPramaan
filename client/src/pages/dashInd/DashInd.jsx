@@ -18,6 +18,7 @@ export default function DashInd({ user }) {
                     </Link>
                 </div>
             </div>
+            <img className="background-stripe" src="images/backdrop.png" alt="backrop" />
         </div>
     )
 }

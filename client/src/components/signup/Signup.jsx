@@ -13,6 +13,7 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
     const [isIndividual, setIsIndividual] = useState(true);
     const [orgLogo, setorgLogo] = useState(null);
     const [orgSignature, setOrgSignature] = useState(null);
+    const [isError, setIsError] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -32,6 +33,18 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
             ...prevData,
             [name]: value
         }));
+    };
+    const handleChangeConfirm = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevData => ({
+            ...prevData,
+            [name]: value
+        }));
+        if(value !== formData.password){
+            setIsError(true);
+        } else {
+            setIsError(false);
+        }
     };
     const handleNext = (e) => {
         e.preventDefault();
@@ -191,7 +204,7 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                         </div>
                         <div className="button-wrapper">
                             <button className='cta' onClick={handleBack}>Back</button>
-                            <button className='cta' onClick={handleNext}>Next</button>
+                            <button className='cta' onClick={handleNext} disabled={!formData.name || !formData.email}>Next</button>
                         </div>
                     </div>
                 );
@@ -200,11 +213,15 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                     <div className='step-2'>
                         <div className="input-wrapper">
                             <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
-                            <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirm Password" required />
+                            <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChangeConfirm} placeholder="Confirm Password" required />
+                            {
+                                isError &&
+                                <span className='error-text'>Passwords don't match!</span>
+                            }
                         </div>
                         <div className="button-wrapper">
                             <button className='cta' onClick={handleBack}>Back</button>
-                            <button className='cta' onClick={handleNext}>Next</button>
+                            <button className='cta' onClick={handleNext} disabled={!formData.email || !formData.password || !formData.confirmPassword}>Next</button>
                         </div>
                     </div>
                 );
@@ -267,7 +284,7 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                         </div>
                         <div className="button-wrapper">
                             <button className='cta' onClick={handleBack}>Back</button>
-                            <button className='cta' onClick={handleNext}>Next</button>
+                            <button className='cta' onClick={handleNext} disabled={!formData.orgName || !formData.orgLogo}>Next</button>
                         </div>
                     </div>
                 );
@@ -275,10 +292,8 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                 return (
                     <div className='step-2'>
                         <div className="input-wrapper">
-                            <div className="input-wrapper">
+                            {/* <div className="input-wrapper">
                                 <h4>Upload issuer Signature</h4>
-                                {/* <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
-                            <input style={{ '-moz-appearance': 'textfield', 'appearance': 'textField' }} type="number" placeholder='Phone number' value={formData.phone} name='phone' onChange={handleChange} /> */}
                                 <div className="image-input">
                                     <input
                                         type="file"
@@ -297,14 +312,18 @@ export default function Signup({ isOnSignup, setIsOnSignup }) {
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            </div> */}
                             <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
                             <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
-                            <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirm Password" required />
+                            <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChangeConfirm} placeholder="Confirm Password" required />
+                            {
+                                isError &&
+                                <span className='error-text'>Passwords don't match!</span>
+                            }
                         </div>
                         <div className="button-wrapper">
                             <button className='cta' onClick={handleBack}>Back</button>
-                            <button className='cta' onClick={handleNext}>Next</button>
+                            <button className='cta' onClick={handleNext} disabled={!formData.email || !formData.password || !formData.confirmPassword}>Next</button>
                         </div>
                     </div>
                 );

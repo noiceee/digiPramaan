@@ -169,6 +169,7 @@ export default function Verify() {
       ) : (
         <></>
       )}
+      <img className="background-stripe" src="images/backdrop.png" alt="backrop" />
     </div>
   );
 }

@@ -9,6 +9,7 @@ export default function Landing({ user, setUser }) {
     const [isOnSignin, setIsOnSignin] = useState(false);
     const [isOnSignup, setIsOnSignup] = useState(false);
     const [isIndividual, setIsIndividual] = useState(true);
+    const [isError, setIsError] = useState(false);
     const emailRef = useRef(null);
     const passwordRef = useRef(null);
     // useEffect(() => {
@@ -54,7 +55,8 @@ export default function Landing({ user, setUser }) {
             localStorage.setItem('user', JSON.stringify(userWithoutPassword));
             setUser(userWithoutPassword);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error.response.data);
+            setIsError(error.response.data);
         }
     };
 
@@ -76,6 +78,7 @@ export default function Landing({ user, setUser }) {
             setUser(userWithoutPassword);
         } catch (error) {
             console.error('Error fetching data:', error);
+            setIsError(error.response.data);
         }
     };
 
@@ -107,6 +110,8 @@ export default function Landing({ user, setUser }) {
                         <div className="input-wrapper">
                             <input placeholder="Email" type="email" name="email" id="email" ref={emailRef} />
                             <input placeholder="Password" type="password" id="password"  onKeyDown={handleKeyPress} ref={passwordRef} />
+                            {isError &&
+                                <span className="error-text">{isError}!</span>}
                         </div>
                         <button className="sign-in-button" onClick={isIndividual ? signInIndividual : signInOrganization}>Sign In</button>
                         <span className="sign-up">New User? <span onClick={() => {
